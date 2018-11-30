@@ -19,7 +19,7 @@ class HomeLayout extends React.Component {
   render() {
     const { location } = this.props;
     return (
-      <Layout style={{ height: '100vh' }}>
+      <Layout style={{ minHeight: '100vh' }}>
         <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
           <h4 className="logo" />
           <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
