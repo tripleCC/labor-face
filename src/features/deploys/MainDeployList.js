@@ -25,6 +25,9 @@ class MainDeployList extends Component {
     return items.map(id => byId[id]);
   }
 
+  handlePageChange = (page, _) => this.getDeployList(page)
+  getTotalText = total => `共 ${total} 条`
+
   render() {
     const dataSource = this.getDataSource();
 
@@ -34,8 +37,8 @@ class MainDeployList extends Component {
       showQuickJumper: true,
       pageSize: perPage,
       total: total,
-      showTotal: total => `共 ${total} 条`,
-      onChange: (page, _) => this.getDeployList(page),
+      showTotal: this.getTotalText,
+      onChange: this.handlePageChange,
     };
 
     return (
