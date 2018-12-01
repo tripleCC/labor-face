@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Divider, Tag } from 'antd';
+import { Table } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
