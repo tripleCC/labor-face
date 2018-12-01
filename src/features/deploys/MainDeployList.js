@@ -1,24 +1,26 @@
 import React, { Component } from 'react';
-import { Table, Form, Select, Button, Col, Row, Input } from 'antd';
+import { Table, Form, Select, Button, Col, Row, Input, message } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
+import { addDeploy } from './redux/addDeploy';
+import AddMainDeployModal from './AddMainDeployModal';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Column } = Table;
 
 class MainDeployList extends Component {
-  constructor(props) {
-    super(props);
-  }
+  state = {
+    addModalVisible: false,
+  };
 
   componentDidMount() {
-    this.getDeployList(1);
+    this.getDeployList();
   }
 
-  getDeployList(page) {
-    this.props.getDeployList(page);
+  getDeployList(page = 1, query = {}) {
+    this.props.getDeployList(page, query);
   }
 
   getDataSource() {
@@ -39,7 +41,15 @@ class MainDeployList extends Component {
       if (err) return;
 
       this.getDeployList(1, fieldsValue);
-      console.log(fieldsValue);
+    });
+  };
+
+  handleSearchReset = () => {
+    const { form } = this.props;
+    form.resetFields();
+
+    this.setState({
+      searchValues: {},
     });
   };
 
@@ -70,9 +80,18 @@ class MainDeployList extends Component {
           </Col>
           <Col md={8} sm={24}>
             <FormItem>
-              <Button type="primary" htmlType="submit" disabled={loading}>
-                查询
-              </Button>
+              <span>
+                <Button type="primary" htmlType="submit" disabled={loading}>
+                  查询
+                </Button>
+                <Button
+                  disabled={loading}
+                  style={{ marginLeft: 8 }}
+                  onClick={this.handleSearchReset}
+                >
+                  重置
+                </Button>
+              </span>
             </FormItem>
           </Col>
         </Row>
@@ -80,10 +99,24 @@ class MainDeployList extends Component {
     );
   }
 
+  handleAddModalVisible = flag => {
+    this.setState({
+      addModalVisible: !!flag,
+    });
+  };
+
+  handleAdd = fieldsValue => {
+    this.props.addDeploy(fieldsValue, () => {
+      this.getDeployList();
+      this.handleAddModalVisible();
+    });
+  };
+
   render() {
     const dataSource = this.getDataSource();
 
     const { loading, perPage, total } = this.props.list;
+    const { addModalVisible } = this.state;
 
     const pagination = {
       showQuickJumper: true,
@@ -96,11 +129,19 @@ class MainDeployList extends Component {
     return (
       <div>
         {this.renderSearchCard()}
+        <Button
+          icon="plus"
+          type="primary"
+          onClick={() => this.handleAddModalVisible(true)}
+        >
+          新建
+        </Button>
         <Table
           dataSource={dataSource}
           rowKey={item => item.id}
           loading={loading}
           pagination={pagination}
+          // onChange=
         >
           <Column title="ID" dataIndex="id" />
           <Column title="名称" dataIndex="name" />
@@ -118,6 +159,12 @@ class MainDeployList extends Component {
             )}
           />
         </Table>
+        <AddMainDeployModal
+          modalVisible={addModalVisible}
+          handleAdd={this.handleAdd}
+          handleAddModalVisible={this.handleAddModalVisible}
+          loading={loading}
+        />
       </div>
     );
   }
@@ -130,7 +177,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getDeployList: page => dispatch(getDeployList(page)),
+    getDeployList: (page, query) => dispatch(getDeployList(page, query)),
+    addDeploy: params => dispatch(addDeploy(params)),
   };
 }
 

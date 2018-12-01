@@ -46,7 +46,7 @@ function getDeployList(page = 1, query = {}, perPage = 8) {
         (err) => {
           dispatch({
             type: DEPLOYS_GET_DEPLOY_LIST_FAILURE,
-            data: { error: err },
+            data: err,
           });
         },
       );
