@@ -18,7 +18,7 @@ const initialState = {
 };
 
 // Action
-function getDeployList(page = 1, perPage = 10, keywords = '') {
+function getDeployList(page = 1, query = {}, perPage = 8) {
   return (dispatch) => {
     dispatch({
       type: DEPLOYS_GET_DEPLOY_LIST_BEGIN,
@@ -28,7 +28,7 @@ function getDeployList(page = 1, perPage = 10, keywords = '') {
         params: {
           page,
           per_page: perPage,
-          keywords,
+          query,
         },
       })
       .then(
