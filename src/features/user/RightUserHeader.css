@@ -1,0 +1,9 @@
+.right-user-header-container {
+    position: absolute;
+    right: 12px;
+    top: 0;
+}
+
+.right-user-header-nickname {
+    padding-left: 8px;
+}

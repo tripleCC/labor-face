@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
+import RightUserHeader from '../user/RightUserHeader';
 import './HomeLayout.css';
 
 const { Header, Sider, Content } = Layout;
@@ -42,6 +43,7 @@ class HomeLayout extends React.Component {
               type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
               onClick={this.toggle}
             />
+            <RightUserHeader />
           </Header>
           <Content
             style={{

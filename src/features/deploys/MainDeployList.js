@@ -19,6 +19,14 @@ class MainDeployList extends Component {
     this.getDeployList();
   }
 
+  componentDidUpdate(prevProps) {
+    const { error } = this.props;
+    if (!prevProps.error && error) {
+      console.log()
+      message.error(error.message);
+    }
+  }
+
   getDeployList(page = 1, query = {}) {
     this.props.getDeployList(page, query);
   }
@@ -147,6 +155,7 @@ class MainDeployList extends Component {
           <Column title="名称" dataIndex="name" />
           <Column title="仓库" dataIndex="repo_url" />
           <Column title="分支" dataIndex="ref" />
+          <Column title="状态" dataIndex="status" />
           <Column
             title="Action"
             key="action"

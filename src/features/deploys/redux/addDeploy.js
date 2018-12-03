@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import axios from 'axios';
 import {
   DEPLOYS_ADD_DEPLOY_BEGIN,
