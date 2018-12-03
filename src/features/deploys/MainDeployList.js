@@ -1,5 +1,20 @@
 import React, { Component } from 'react';
-import { Table, Form, Select, Button, Col, Row, Input, message } from 'antd';
+import {
+  Table,
+  Form,
+  Select,
+  Button,
+  Col,
+  Row,
+  Input,
+  message,
+  Divider,
+  Dropdown,
+  Menu,
+  Icon,
+  Modal
+} from 'antd';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
@@ -9,6 +24,7 @@ import AddMainDeployModal from './AddMainDeployModal';
 const FormItem = Form.Item;
 const { Option } = Select;
 const { Column } = Table;
+const confirm = Modal.confirm;
 
 class MainDeployList extends Component {
   state = {
@@ -119,11 +135,23 @@ class MainDeployList extends Component {
 
   handleAdd = fieldsValue => {
     this.props.addDeploy(fieldsValue, () => {
-      message.success("新建发布成功!")
+      message.success('新建发布成功!');
       this.getDeployList();
       this.handleAddModalVisible();
     });
   };
+
+  handleAnalyze = (item) => {
+    confirm({
+      title: '确认重新分析依赖?',
+      content: '此操作会覆盖旧发布信息，其下所有组件发布状态都将重置为初始状态',
+      okText: '确定',
+      cancelText: '取消',
+      onOk() {
+        
+      }
+    });
+  }
 
   render() {
     const dataSource = this.getDataSource();
@@ -162,12 +190,27 @@ class MainDeployList extends Component {
           <Column title="分支" dataIndex="ref" />
           <Column title="状态" dataIndex="status" />
           <Column
-            title="Action"
+            title="操作"
             key="action"
-            render={() => (
+            render={(text, item, index) => (
               <span>
-                {/* <a href="javascript:;">Invite {record.lastName}</a> */}
-                {/* <Divider type="vertical" /> */}
+                <Link to={`/deploys/${item.id}`}>详情</Link>
+                <Divider type="vertical" />
+                <a onClick={(item) => this.handleAnalyze(item)} >分析</a>
+                <Divider type="vertical" />
+                <Dropdown
+                  overlay={
+                    <Menu onClick={({ key }) => console.log(key)}>
+                      <Menu.Item key="detail">详情</Menu.Item>
+                      <Menu.Item key="analyze">分析</Menu.Item>
+                      <Menu.Item key="delete">删除</Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <a>
+                    更多 <Icon type="down" />
+                  </a>
+                </Dropdown>
                 {/* <a href="javascript:;">Delete</a> */}
               </span>
             )}

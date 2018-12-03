@@ -7,6 +7,7 @@ import history from './common/history';
 import LoginHandler from './features/user/LoginHandler';
 import HomeLayout from './features/common/HomeLayout';
 import MainDeployList from './features/deploys/MainDeployList';
+import MainDeployDetailCard from './features/deploys/MainDeployDetailCard'
 
 class HomePage extends React.Component {
   render() {
@@ -17,6 +18,7 @@ class HomePage extends React.Component {
           <HomeLayout>
             <Switch>
               <Route exact path="/" render={() => <Redirect to="/deploys" />} />
+              <Route path="/deploys/:id" component={MainDeployDetailCard} />
               <Route path="/deploys" component={MainDeployList} />
               <Route path="/oauth/handler" component={LoginHandler} />
             </Switch>
