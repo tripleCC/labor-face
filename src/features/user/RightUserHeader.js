@@ -66,11 +66,11 @@ class RightUserHeader extends React.PureComponent {
     );
   }
   render() {
-    const { info } = this.props;
+    const { logined } = this.props;
 
     return (
       <div className="right-user-header-container">
-        {!!info ? this.renderAvatar() : this.renderLogin()}
+        {logined ? this.renderAvatar() : this.renderLogin()}
       </div>
     );
   }
@@ -78,9 +78,9 @@ class RightUserHeader extends React.PureComponent {
 
 function mapStateToProps(state) {
   const {
-    user: { info },
+    user: { info, logined },
   } = state;
-  return { info };
+  return { info, logined };
 }
 
 function mapDispatchToProps(dispatch) {

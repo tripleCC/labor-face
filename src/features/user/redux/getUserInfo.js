@@ -31,8 +31,10 @@ function removeUser() {
   localStorage.removeItem('user');
 }
 
+const user = getUser()
 const initialState = {
-  info: getUser(),
+  info: user,
+  logined: !!user
 };
 
 // Action
@@ -98,12 +100,14 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         info: action.data,
+        logined: true,
         loading: false,
         error: null,
       };
     case USER_GET_USER_INFO_FAILURE:
       return {
         ...state,
+        logined: false,
         loading: false,
         error: action.data.error,
       };
@@ -111,6 +115,7 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         info: null,
+        logined: false,
         error: null,
         loading: false,
       };

@@ -22,7 +22,6 @@ class MainDeployList extends Component {
   componentDidUpdate(prevProps) {
     const { error } = this.props;
     if (!prevProps.error && error) {
-      console.log()
       message.error(error.message);
     }
   }
@@ -108,13 +107,19 @@ class MainDeployList extends Component {
   }
 
   handleAddModalVisible = flag => {
-    this.setState({
-      addModalVisible: !!flag,
-    });
+    const { logined } = this.props;
+    if (logined) {
+      this.setState({
+        addModalVisible: !!flag,
+      });
+    } else {
+      message.warn('登录后才能执行此操作');
+    }
   };
 
   handleAdd = fieldsValue => {
     this.props.addDeploy(fieldsValue, () => {
+      message.success("新建发布成功!")
       this.getDeployList();
       this.handleAddModalVisible();
     });
@@ -180,8 +185,11 @@ class MainDeployList extends Component {
 }
 
 function mapStateToProps(state) {
-  const { deploys } = state;
-  return { list: deploys };
+  const {
+    deploys,
+    user: { logined },
+  } = state;
+  return { list: deploys, logined };
 }
 
 function mapDispatchToProps(dispatch) {
