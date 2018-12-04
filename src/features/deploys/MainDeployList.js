@@ -22,6 +22,7 @@ import { getDeployList } from './redux/getDeployList';
 import { addDeploy } from './redux/addDeploy';
 import AddMainDeployModal from './AddMainDeployModal';
 import StatusConverter from './utils/statusConverter';
+import './MainDeployList.css';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -55,7 +56,7 @@ class MainDeployList extends Component {
     if (!items) return [];
     return items.map(id => {
       let item = byId[id];
-      return {...item, statusConverter: new StatusConverter(item.status)};
+      return { ...item, statusConverter: new StatusConverter(item.status) };
     });
   }
 
@@ -91,12 +92,12 @@ class MainDeployList extends Component {
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+          <Col md={9} sm={24}>
             <FormItem label="规则名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={9} sm={24}>
             <FormItem label="使用状态">
               {getFieldDecorator('status', {
                 initialValue: '0',
@@ -108,7 +109,7 @@ class MainDeployList extends Component {
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={6} sm={24}>
             <FormItem>
               <span>
                 <Button type="primary" htmlType="submit" disabled={loading}>
@@ -178,14 +179,16 @@ class MainDeployList extends Component {
 
     return (
       <div>
-        {this.renderSearchCard()}
-        <Button
-          icon="plus"
-          type="primary"
-          onClick={() => this.handleAddModalVisible(true)}
-        >
-          新建
-        </Button>
+        <div className="main-deploy-list-search">{this.renderSearchCard()}</div>
+        <div className="main-deploy-list-add-button">
+          <Button
+            icon="plus"
+            type="primary"
+            onClick={() => this.handleAddModalVisible(true)}
+          >
+            新建
+          </Button>
+        </div>
         <Table
           dataSource={dataSource}
           rowKey={item => item.id}
