@@ -13,6 +13,7 @@ import {
   Menu,
   Icon,
   Modal,
+  Badge,
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -20,6 +21,7 @@ import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
 import { addDeploy } from './redux/addDeploy';
 import AddMainDeployModal from './AddMainDeployModal';
+import StatusConverter from './utils/statusConverter';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -189,11 +191,18 @@ class MainDeployList extends Component {
           <Column title="仓库" dataIndex="repo_url" />
           <Column title="分支" dataIndex="ref" />
           <Column title="负责人" dataIndex="user.nickname" />
-          <Column title="状态" dataIndex="status" />
+          <Column
+            title="状态"
+            dataIndex="status"
+            render={status => {
+              const converter = new StatusConverter(status);
+              return <Badge status={converter.badge} text={converter.text} />;
+            }}
+          />
           <Column
             title="操作"
             key="action"
-            render={(item) => (
+            render={item => (
               <span>
                 <Link to={`/deploys/${item.id}`}>详情</Link>
                 <Divider type="vertical" />
