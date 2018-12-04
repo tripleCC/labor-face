@@ -188,11 +188,12 @@ class MainDeployList extends Component {
           <Column title="名称" dataIndex="name" />
           <Column title="仓库" dataIndex="repo_url" />
           <Column title="分支" dataIndex="ref" />
+          <Column title="负责人" dataIndex="user.nickname" />
           <Column title="状态" dataIndex="status" />
           <Column
             title="操作"
             key="action"
-            render={(text, item, index) => (
+            render={(item) => (
               <span>
                 <Link to={`/deploys/${item.id}`}>详情</Link>
                 <Divider type="vertical" />
@@ -231,7 +232,6 @@ function mapStateToProps(state) {
   const {
     deploys,
     user: { logined },
-    error,
   } = state;
   return { list: deploys, logined };
 }

@@ -18,12 +18,16 @@ class HomeLayout extends React.Component {
   };
 
   render() {
-    const { location } = this.props;
+    const {
+      location: { pathname },
+    } = this.props;
+    const matchPathname = `/${pathname.split("/", 2)[1]}`
+
     return (
       <Layout style={{ minHeight: '100vh' }}>
         <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
-          <h4 className="logo" />
-          <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline" selectedKeys={[matchPathname]}>
             <Menu.Item key="/deploys">
               <Link to="/deploys">
                 <Icon type="hdd" />

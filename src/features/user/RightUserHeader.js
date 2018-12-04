@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Dropdown, Icon, Button, Menu, message } from 'antd';
+import { Avatar, Dropdown, Icon, Button, Menu } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 

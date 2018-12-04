@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   COMMON_SHOW_GLOBAL_SPIN_BEGIN,
   COMMON_SHOW_GLOBAL_SPIN_END,
