@@ -42,7 +42,7 @@ class MainDeployList extends Component {
       list: { error },
     } = this.props;
     if (!prevProps.error && error) {
-      message.error(error.message);
+      message.error(error);
     }
   }
 
@@ -141,7 +141,7 @@ class MainDeployList extends Component {
     this.props.addDeploy(fieldsValue, () => {
       message.success('新建发布成功!');
       this.getDeployList();
-      this.handleAddModalVisible();
+      this.handleAddModalVisible(false);
     });
   };
 
@@ -248,7 +248,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     getDeployList: (page, query) => dispatch(getDeployList(page, query)),
-    addDeploy: params => dispatch(addDeploy(params)),
+    addDeploy: (params, callback) => dispatch(addDeploy(params, callback)),
   };
 }
 

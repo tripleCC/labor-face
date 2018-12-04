@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, Dropdown, Icon, Button, Menu } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import axios from 'axios';
 
 import {
   YO_CLIENT_ID,
@@ -67,8 +68,22 @@ class RightUserHeader extends React.PureComponent {
       </Button>
     );
   }
+
+  setAxiosAuth() {
+    const { info } = this.props;
+
+    axios.defaults.auth = {
+      username: info.sub,
+      password: info.id,
+    };
+  }
+
   render() {
     const { logined } = this.props;
+
+    if (logined) {
+      this.setAxiosAuth();
+    }
 
     return (
       <div className="right-user-header-container">

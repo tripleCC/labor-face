@@ -3,6 +3,7 @@ import { connectRouter } from 'connected-react-router';
 import deploysReducer from '../features/deploys/redux/reducer';
 import commonReducer from '../features/common/redux/reducer';
 import userReducer from '../features/user/redux/reducer';
+import websocketReducer from '../features/websocket/redux/reducer';
 
 export const initialState = {
   deploys: {},
@@ -14,5 +15,6 @@ export default history =>
     deploys: deploysReducer,
     common: commonReducer,
     user: userReducer,
+    websocket: websocketReducer,
     // rest of your reducers
   });

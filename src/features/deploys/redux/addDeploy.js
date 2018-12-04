@@ -13,17 +13,13 @@ const initialState = {
 };
 
 // Action
-function addDeploy(name, repo_url, ref, callback) {
+function addDeploy(params, callback) {
   return dispatch => {
     dispatch({
       type: DEPLOYS_ADD_DEPLOY_BEGIN,
     });
     return axios
-      .post(`${SERVER_HOST}/deploys`, {
-        name,
-        repo_url,
-        ref,
-      })
+      .post(`${SERVER_HOST}/deploys`, params)
       .then(
         res => {
           dispatch({
@@ -35,7 +31,7 @@ function addDeploy(name, repo_url, ref, callback) {
         err => {
           dispatch({
             type: DEPLOYS_ADD_DEPLOY_FAILURE,
-            data: err ,
+            data: !err.response ? err.message : err.response.data.errors.join(', '),
           });
         },
       );

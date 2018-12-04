@@ -15,7 +15,7 @@ class LoginHandler extends React.PureComponent {
   componentDidUpdate(prevProps) {
     const { error } = this.props;
     if (!prevProps.error && error) {
-      message.error(error.message);
+      message.error(error);
     }
   }
 

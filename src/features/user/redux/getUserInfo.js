@@ -70,7 +70,7 @@ function getUserInfo(code) {
         err => {
           dispatch({
             type: USER_GET_USER_INFO_FAILURE,
-            data: err,
+            data: err.message,
           });
         },
       )

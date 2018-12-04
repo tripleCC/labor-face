@@ -23,7 +23,7 @@ function getDeployDetail(id) {
       (err) => {
         dispatch({
           type: DEPLOYS_GET_DEPLOY_DETAIL_FAILURE,
-          data: err,
+          data: err.message,
         });
       },
     );
