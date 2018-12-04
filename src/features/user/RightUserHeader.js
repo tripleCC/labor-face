@@ -1,6 +1,7 @@
 import React from 'react';
-import { Avatar, Dropdown, Icon, Button, Menu } from 'antd';
+import { Avatar, Dropdown, Icon, Button, Menu, message } from 'antd';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 
 import {
   YO_CLIENT_ID,
@@ -12,9 +13,10 @@ import './RightUserHeader.css';
 
 class RightUserHeader extends React.PureComponent {
   onMenuClick = item => {
-    const { logout } = this.props;
+    const { logout, history } = this.props;
     switch (item.key) {
       case 'logout':
+        history.push('/');
         logout();
         break;
       default:
@@ -89,7 +91,9 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(RightUserHeader);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(RightUserHeader),
+);

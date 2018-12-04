@@ -12,7 +12,7 @@ import {
   Dropdown,
   Menu,
   Icon,
-  Modal
+  Modal,
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -36,7 +36,9 @@ class MainDeployList extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { error } = this.props;
+    const {
+      list: { error },
+    } = this.props;
     if (!prevProps.error && error) {
       message.error(error.message);
     }
@@ -141,17 +143,15 @@ class MainDeployList extends Component {
     });
   };
 
-  handleAnalyze = (item) => {
+  handleAnalyze = item => {
     confirm({
       title: '确认重新分析依赖?',
       content: '此操作会覆盖旧发布信息，其下所有组件发布状态都将重置为初始状态',
       okText: '确定',
       cancelText: '取消',
-      onOk() {
-        
-      }
+      onOk() {},
     });
-  }
+  };
 
   render() {
     const dataSource = this.getDataSource();
@@ -196,7 +196,7 @@ class MainDeployList extends Component {
               <span>
                 <Link to={`/deploys/${item.id}`}>详情</Link>
                 <Divider type="vertical" />
-                <a onClick={(item) => this.handleAnalyze(item)} >分析</a>
+                <a onClick={item => this.handleAnalyze(item)}>分析</a>
                 <Divider type="vertical" />
                 <Dropdown
                   overlay={
@@ -231,6 +231,7 @@ function mapStateToProps(state) {
   const {
     deploys,
     user: { logined },
+    error,
   } = state;
   return { list: deploys, logined };
 }

@@ -109,7 +109,7 @@ function reducer(state = initialState, action) {
         ...state,
         logined: false,
         loading: false,
-        error: action.data.error,
+        error: action.data,
       };
     case USER_LOGOUT_SUCCESS:
       return {

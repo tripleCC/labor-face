@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getUserInfo } from './redux/getUserInfo';
 import { Redirect } from 'react-router';
+import { message, Alert } from 'antd';
 
 class LoginHandler extends React.PureComponent {
   componentDidMount() {
@@ -11,9 +12,31 @@ class LoginHandler extends React.PureComponent {
     getUserInfo(code);
   }
 
-  render() {
-    return <Redirect to="/" />;
+  componentDidUpdate(prevProps) {
+    const { error } = this.props;
+    if (!prevProps.error && error) {
+      message.error(error.message);
+    }
   }
+
+  render() {
+    const { logined, error } = this.props;
+
+    return !!error ? (
+      <Alert message={`登录失败，重新登录! ${error.message}`} type="error" />
+    ) : logined ? (
+      <Redirect to="/" />
+    ) : (
+      <div>登录中...</div>
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  const {
+    user: { error, logined },
+  } = state;
+  return { error, logined };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -23,6 +46,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(LoginHandler);
