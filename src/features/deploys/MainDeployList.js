@@ -53,7 +53,10 @@ class MainDeployList extends Component {
   getDataSource() {
     const { items, byId } = this.props.list;
     if (!items) return [];
-    return items.map(id => byId[id]);
+    return items.map(id => {
+      let item = byId[id];
+      return {...item, statusConverter: new StatusConverter(item.status)};
+    });
   }
 
   handlePageChange = (page, _) => this.getDeployList(page);
@@ -146,13 +149,17 @@ class MainDeployList extends Component {
   };
 
   handleAnalyze = item => {
-    confirm({
-      title: '确认重新分析依赖?',
-      content: '此操作会覆盖旧发布信息，其下所有组件发布状态都将重置为初始状态',
-      okText: '确定',
-      cancelText: '取消',
-      onOk() {},
-    });
+    if (item.statusConverter.hasDetail()) {
+      confirm({
+        title: '确认重新分析依赖?',
+        content:
+          '重新分析依赖关系会覆盖旧发布信息，其下所有组件发布状态都将重置为待分析状态',
+        okText: '确定',
+        cancelText: '取消',
+        onOk() {},
+      });
+    } else {
+    }
   };
 
   render() {
@@ -193,37 +200,40 @@ class MainDeployList extends Component {
           <Column title="负责人" dataIndex="user.nickname" />
           <Column
             title="状态"
-            dataIndex="status"
+            dataIndex="statusConverter"
             render={status => {
-              const converter = new StatusConverter(status);
-              return <Badge status={converter.badge} text={converter.text} />;
+              return <Badge status={status.badge} text={status.text} />;
             }}
           />
           <Column
             title="操作"
             key="action"
-            render={item => (
-              <span>
-                <Link to={`/deploys/${item.id}`}>详情</Link>
-                <Divider type="vertical" />
-                <a onClick={item => this.handleAnalyze(item)}>分析</a>
-                <Divider type="vertical" />
-                <Dropdown
-                  overlay={
-                    <Menu onClick={({ key }) => console.log(key)}>
-                      <Menu.Item key="detail">详情</Menu.Item>
-                      <Menu.Item key="analyze">分析</Menu.Item>
-                      <Menu.Item key="delete">删除</Menu.Item>
-                    </Menu>
-                  }
-                >
-                  <a>
-                    更多 <Icon type="down" />
-                  </a>
-                </Dropdown>
-                {/* <a href="javascript:;">Delete</a> */}
-              </span>
-            )}
+            render={item => {
+              return (
+                <span>
+                  {item.statusConverter.hasDetail() && (
+                    <span>
+                      <Link to={`/deploys/${item.id}`}>详情</Link>
+                      <Divider type="vertical" />
+                    </span>
+                  )}
+                  <a onClick={() => this.handleAnalyze(item)}>分析</a>
+                  <Divider type="vertical" />
+                  <Dropdown
+                    overlay={
+                      <Menu onClick={({ key }) => console.log(key)}>
+                        <Menu.Item key="delete">删除</Menu.Item>
+                      </Menu>
+                    }
+                  >
+                    <a>
+                      更多 <Icon type="down" />
+                    </a>
+                  </Dropdown>
+                  {/* <a href="javascript:;">Delete</a> */}
+                </span>
+              );
+            }}
           />
         </Table>
         <AddMainDeployModal

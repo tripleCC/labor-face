@@ -38,6 +38,10 @@ class StatusConverter {
     }
     return 'default';
   }
+
+  hasDetail() {
+    return this.status !== 'created'
+  }
 }
 
 export default StatusConverter;
