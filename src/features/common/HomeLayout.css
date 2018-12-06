@@ -16,11 +16,19 @@
     margin: 16px;
 }
 
-.hl-content {
+.hl-padding-content {
     margin-top: 14px;
     margin-left: 16px;
     margin-right: 16px;
     margin-bottom: 16px;
     padding: 24px;
+    background: #fff;
+}
+
+.hl-no-padding-content {
+    margin-top: 14px;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 16px;
     background: #fff;
 }

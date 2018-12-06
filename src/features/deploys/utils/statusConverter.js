@@ -14,7 +14,7 @@ const statusBadgeMapper = new Map([
   ['success', ['success']],
   ['processing', ['deploying', 'analyzing', 'merged']],
   ['default', ['created', 'canceled', 'skipped']],
-  ['error', ['error']],
+  ['error', ['failed']],
   ['warning', ['pending']],
 ]);
 

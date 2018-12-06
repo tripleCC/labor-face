@@ -178,7 +178,7 @@ class MainDeployList extends Component {
     };
 
     return (
-      <div className="hl-content">
+      <div className="hl-padding-content">
         <div className="main-deploy-list-search">{this.renderSearchCard()}</div>
         <div className="main-deploy-list-add-button">
           <Button
@@ -255,6 +255,7 @@ function mapStateToProps(state) {
     deploys,
     user: { logined },
   } = state;
+  console.log(deploys)
   return { list: deploys, logined };
 }
 
