@@ -21,7 +21,7 @@ class HomeLayout extends React.Component {
     const {
       location: { pathname },
     } = this.props;
-    const matchPathname = `/${pathname.split("/", 2)[1]}`
+    const matchPathname = `/${pathname.split('/', 2)[1]}`;
 
     return (
       <Layout style={{ minHeight: '100vh' }}>
@@ -51,9 +51,7 @@ class HomeLayout extends React.Component {
           </Header>
           <Content
             style={{
-              margin: '24px 16px',
-              padding: 24,
-              background: '#fff',
+              marginTop: 2,
               minHeight: 280,
             }}
           >

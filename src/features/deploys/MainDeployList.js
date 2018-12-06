@@ -178,7 +178,7 @@ class MainDeployList extends Component {
     };
 
     return (
-      <div>
+      <div className="hl-content">
         <div className="main-deploy-list-search">{this.renderSearchCard()}</div>
         <div className="main-deploy-list-add-button">
           <Button
