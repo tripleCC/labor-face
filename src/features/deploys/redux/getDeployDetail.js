@@ -4,19 +4,13 @@ import {
   DEPLOYS_GET_DEPLOY_DETAIL_SUCCESS,
   DEPLOYS_GET_DEPLOY_DETAIL_FAILURE,
 } from './constants';
+import {
+  beginContentSpin,
+  endContentSpin,
+} from '../../common/redux/showContentSpin';
 
 import { SERVER_HOST } from '../../../common/constants';
-
-const initialState = {
-  owner: '无',
-  status: 'analyzing',
-  createdAt: new Date().toLocaleDateString,
-  shouldPushDing: false,
-  failureReason: null,
-  pods: [],
-  loading: false,
-  error: null,
-};
+import { initialState } from './reducer';
 
 // Action
 function getDeployDetail(id) {
@@ -24,20 +18,26 @@ function getDeployDetail(id) {
     dispatch({
       type: DEPLOYS_GET_DEPLOY_DETAIL_BEGIN,
     });
-    return axios.get(`${SERVER_HOST}/deploys/${id}`).then(
-      res => {
-        dispatch({
-          type: DEPLOYS_GET_DEPLOY_DETAIL_SUCCESS,
-          data: res.data.data,
-        });
-      },
-      err => {
-        dispatch({
-          type: DEPLOYS_GET_DEPLOY_DETAIL_FAILURE,
-          data: err.message,
-        });
-      },
-    );
+    beginContentSpin(dispatch);
+    return axios
+      .get(`${SERVER_HOST}/deploys/${id}`)
+      .then(
+        res => {
+          dispatch({
+            type: DEPLOYS_GET_DEPLOY_DETAIL_SUCCESS,
+            data: res.data.data,
+          });
+        },
+        err => {
+          dispatch({
+            type: DEPLOYS_GET_DEPLOY_DETAIL_FAILURE,
+            data: err.message,
+          });
+        },
+      )
+      .finally(() => {
+        endContentSpin(dispatch);
+      });
   };
 }
 
@@ -53,12 +53,12 @@ function reducer(state = initialState, action) {
     case DEPLOYS_GET_DEPLOY_DETAIL_SUCCESS:
       return {
         ...state,
-        owner: !!action.data.user && action.data.user.nickname,
-        createdAt: action.data.created_at,
-        status: action.data.status,
-        failureReason: action.data.failure_reason,
-        shouldPushDing: action.data.should_push_ding,
-        pods: action.data.pod_deploys,
+        detail: action.data,
+        detailById: action.data.pod_deploys.reduce(
+          (byId, item) => ({ ...byId, [item.id]: item }),
+          {},
+        ),
+        detailItems: action.data.pod_deploys.map(item => item.id),
         loading: false,
         error: null,
       };

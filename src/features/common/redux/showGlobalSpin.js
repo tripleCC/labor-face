@@ -2,11 +2,7 @@ import {
   COMMON_SHOW_GLOBAL_SPIN_BEGIN,
   COMMON_SHOW_GLOBAL_SPIN_END,
 } from './constants';
-
-const initialState = {
-  globalSpinning: false,
-  globalSpinTip: null,
-};
+import { initialState } from './reducer';
 
 // Action
 function beginGlobalSpin(dispatch, tip) {
@@ -24,7 +20,7 @@ function endGlobalSpin(dispatch) {
 
 // Reducer
 function reducer(state = initialState, action) {
-  console.log(action)
+
   switch (action.type) {
     case COMMON_SHOW_GLOBAL_SPIN_BEGIN:
       return {

@@ -6,11 +6,7 @@ import {
 } from './constants';
 
 import { SERVER_HOST } from '../../../common/constants';
-
-const initialState = {
-  loading: false,
-  error: null,
-};
+import { initialState } from './reducer';
 
 // Action
 function addDeploy(params, callback) {

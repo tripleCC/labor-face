@@ -6,20 +6,11 @@ import {
 } from './constants';
 
 import { SERVER_HOST } from '../../../common/constants';
-
-const initialState = {
-  items: [],
-  page: 1,
-  perPage: 3,
-  total: 0,
-  byId: {},
-  loading: false,
-  error: null,
-};
+import { initialState } from './reducer';
 
 // Action
 function getDeployList(page = 1, query = {}, perPage = 8) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch({
       type: DEPLOYS_GET_DEPLOY_LIST_BEGIN,
     });
@@ -32,7 +23,7 @@ function getDeployList(page = 1, query = {}, perPage = 8) {
         },
       })
       .then(
-        (res) => {
+        res => {
           dispatch({
             type: DEPLOYS_GET_DEPLOY_LIST_SUCCESS,
             data: {
@@ -43,7 +34,7 @@ function getDeployList(page = 1, query = {}, perPage = 8) {
             },
           });
         },
-        (err) => {
+        err => {
           dispatch({
             type: DEPLOYS_GET_DEPLOY_LIST_FAILURE,
             data: err.message,
@@ -65,7 +56,10 @@ function reducer(state = initialState, action) {
     case DEPLOYS_GET_DEPLOY_LIST_SUCCESS:
       return {
         ...state,
-        byId: action.data.items.reduce((byId, item) => ({ ...byId, [item.id]: item }), {}),
+        byId: action.data.items.reduce(
+          (byId, item) => ({ ...byId, [item.id]: item }),
+          {},
+        ),
         items: action.data.items.map(item => item.id),
         page: action.data.page,
         perPage: action.data.perPage,

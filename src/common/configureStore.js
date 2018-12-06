@@ -3,11 +3,10 @@ import thunkMiddleware from 'redux-thunk';
 import { routerMiddleware } from 'connected-react-router';
 import { applyMiddleware, compose, createStore } from 'redux';
 import history from './history';
-import rootReducer, { initialState } from './rootReducer';
+import rootReducer from './rootReducer';
 
 const store = createStore(
   rootReducer(history),
-  initialState,
   compose(
     applyMiddleware(
       routerMiddleware(history),

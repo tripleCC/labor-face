@@ -40,7 +40,7 @@ class MainDeployList extends Component {
 
   componentDidUpdate(prevProps) {
     const {
-      list: { error },
+      info: { error },
     } = this.props;
     if (!prevProps.error && error) {
       message.error(error);
@@ -52,7 +52,7 @@ class MainDeployList extends Component {
   }
 
   getDataSource() {
-    const { items, byId } = this.props.list;
+    const { items, byId } = this.props.info;
     if (!items) return [];
     return items.map(id => {
       let item = byId[id];
@@ -87,7 +87,7 @@ class MainDeployList extends Component {
   renderSearchCard() {
     const {
       form: { getFieldDecorator },
-      list: { loading },
+      info: { loading },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
@@ -166,7 +166,7 @@ class MainDeployList extends Component {
   render() {
     const dataSource = this.getDataSource();
 
-    const { loading, perPage, total } = this.props.list;
+    const { loading, perPage, total } = this.props.info;
     const { addModalVisible } = this.state;
 
     const pagination = {
@@ -255,8 +255,8 @@ function mapStateToProps(state) {
     deploys,
     user: { logined },
   } = state;
-  console.log(deploys)
-  return { list: deploys, logined };
+
+  return { info: deploys, logined };
 }
 
 function mapDispatchToProps(dispatch) {

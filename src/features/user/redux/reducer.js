@@ -1,4 +1,4 @@
-import reduceReducers from 'reduce-reducers';
+// import reduceReducers from 'reduce-reducers';
 import {reducer as getUserInfoReducer} from './getUserInfo'
 
 // const reducer = reduceReducers(

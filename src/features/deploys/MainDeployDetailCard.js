@@ -32,9 +32,9 @@ class MainDeployDetailCard extends React.PureComponent {
       connectWebsocket,
       getDeployDetail,
     } = this.props;
-    this.websocket = connectWebsocket(id);
 
     getDeployDetail(id);
+    this.websocket = connectWebsocket(id);
   }
 
   componentWillUnmount() {
@@ -42,16 +42,42 @@ class MainDeployDetailCard extends React.PureComponent {
   }
 
   renderDescription() {
-    const { owner, shouldPushDing, createdAt, pods } = this.props;
+    const {
+      info: {
+        detail: { user, should_push_ding, created_at },
+        detailItems,
+      },
+    } = this.props;
     return (
       <DescriptionList size="small" col="2">
-        <Description term="负责人">{owner}</Description>
-        <Description term="允许发送钉钉">
-          {shouldPushDing ? '是' : '否'}
+        <Description term="负责人">
+          {!!user ? user.nickname : '未知'}
         </Description>
-        <Description term="创建时间">{!!createdAt && (new Date(createdAt)).toLocaleDateString()}</Description>
-        <Description term="组件数量">{!!pods ? pods.length : 0}</Description>
+        <Description term="允许发送钉钉">
+          {should_push_ding ? '是' : '否'}
+        </Description>
+        <Description term="创建时间">
+          {new Date(created_at).toLocaleDateString()}
+        </Description>
+        <Description term="组件数量">{detailItems.length}</Description>
       </DescriptionList>
+    );
+  }
+
+  renderExtra() {
+    const {
+      info: {
+        detail: { status },
+      },
+    } = this.props;
+    const statusConverter = new StatusConverter(status);
+    return (
+      <Row>
+        <Col xs={24} sm={12}>
+          <div className="mddc-header-extra-title">状态</div>
+          <div className="mddc-header-extra-text">{statusConverter.text}</div>
+        </Col>
+      </Row>
     );
   }
 
@@ -82,42 +108,54 @@ class MainDeployDetailCard extends React.PureComponent {
   }
 
   getDataSource() {
-    const { pods } = this.props;
-    if (!pods) return [];
-    return pods.map(item => ({
-      ...item,
-      owner: !!item.user ? item.user.nickname : '无',
-      statusConverter: new StatusConverter(item.status),
-    }));
+    const {
+      info: { detailItems, detailById },
+    } = this.props;
+    if (!detailItems) return [];
+    return detailItems.map(id => {
+      let item = detailById[id];
+      return { ...item, statusConverter: new StatusConverter(item.status) };
+    });
   }
 
+  handlePublish = item => {
+    console.log(item);
+  };
+
   render() {
-    const { loading } = this.props;
+    const {
+      info: {
+        detail: { name },
+      },
+    } = this.props;
     const dataSource = this.getDataSource();
     return (
       <div>
         <PageHeader
-          title="1231342341"
+          title={name || ' '}
           content={this.renderDescription()}
           action={this.renderAction()}
+          extraContent={this.renderExtra()}
         />
         <div className="hl-no-padding-content">
           <Card title="发布组件" bordered={false}>
             <Table
               dataSource={dataSource}
               rowKey={item => item.id}
-              loading={loading}
               pagination={false}
             >
               <Column title="ID" dataIndex="id" />
               <Column title="名称" dataIndex="name" />
               <Column title="分支" dataIndex="ref" />
-              <Column title="负责人" dataIndex="owner" />
+              <Column
+                title="负责人"
+                dataIndex="owner"
+                render={owner => <div>{owner || '未知'}</div>}
+              />
               <Column
                 title="状态"
                 dataIndex="statusConverter"
                 render={status => {
-                  console.log(status.badge);
                   return <Badge status={status.badge} text={status.text} />;
                 }}
               />
@@ -128,7 +166,7 @@ class MainDeployDetailCard extends React.PureComponent {
                 render={item => {
                   return (
                     <span>
-                      <a onClick={() => this.handleAnalyze(item)}>发布</a>
+                      <a onClick={() => this.handlePublish(item)}>发布</a>
                       <Divider type="vertical" />
                       <Dropdown
                         overlay={
@@ -155,27 +193,8 @@ class MainDeployDetailCard extends React.PureComponent {
 }
 
 function mapStateToProps(state) {
-  const {
-    deploys: {
-      owner,
-      createdAt,
-      status,
-      failureReason,
-      shouldPushDing,
-      pods,
-      loading,
-    },
-  } = state;
-
-  return {
-    owner,
-    createdAt,
-    status,
-    failureReason,
-    shouldPushDing,
-    pods,
-    loading,
-  };
+  const { deploys } = state;
+  return { info: deploys };
 }
 
 function mapDispatchToProps(dispatch) {
