@@ -31,10 +31,10 @@ function removeUser() {
   localStorage.removeItem('user');
 }
 
-const user = getUser()
+const user = getUser();
 const initialState = {
   info: user,
-  logined: !!user
+  logined: !!user,
 };
 
 // Action
@@ -57,6 +57,7 @@ function getUserInfo(code) {
       })
       .then(
         res => {
+          endGlobalSpin(dispatch);
           const user = !!res.data && res.data.data;
           if (!!user) {
             saveUser(user);
@@ -68,15 +69,13 @@ function getUserInfo(code) {
           });
         },
         err => {
+          endGlobalSpin(dispatch);
           dispatch({
             type: USER_GET_USER_INFO_FAILURE,
             data: err.message,
           });
         },
-      )
-      .finally(() => {
-        endGlobalSpin(dispatch);
-      });
+      );
   };
 }
 

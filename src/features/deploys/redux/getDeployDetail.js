@@ -23,21 +23,20 @@ function getDeployDetail(id) {
       .get(`${SERVER_HOST}/deploys/${id}`)
       .then(
         res => {
+          endContentSpin(dispatch);
           dispatch({
             type: DEPLOYS_GET_DEPLOY_DETAIL_SUCCESS,
             data: res.data.data,
           });
         },
         err => {
+          endContentSpin(dispatch);
           dispatch({
             type: DEPLOYS_GET_DEPLOY_DETAIL_FAILURE,
             data: err.message,
           });
         },
-      )
-      .finally(() => {
-        endContentSpin(dispatch);
-      });
+      );
   };
 }
 
@@ -66,7 +65,7 @@ function reducer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        error: action.data.error,
+        error: action.data,
       };
     default:
       return state;

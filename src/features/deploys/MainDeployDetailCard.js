@@ -11,6 +11,7 @@ import {
   Badge,
   Divider,
   Card,
+  message
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
 import { WEBSOCKET_LABOR_DEPLOY_PROCESS_MODULE } from '../websocket/redux/constants';
@@ -35,6 +36,17 @@ class MainDeployDetailCard extends React.PureComponent {
 
     getDeployDetail(id);
     this.websocket = connectWebsocket(id);
+  }
+
+
+  componentDidUpdate(prevProps) {
+    const {
+      info: { error },
+    } = this.props;
+    if (!prevProps.error && error) {
+      console.log(error)
+      message.error(error);
+    }
   }
 
   componentWillUnmount() {
