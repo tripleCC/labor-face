@@ -11,13 +11,15 @@ import {
   Badge,
   Divider,
   Card,
-  message
+  message,
+  Popconfirm,
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
 import { WEBSOCKET_LABOR_DEPLOY_PROCESS_MODULE } from '../websocket/redux/constants';
 import StatusConverter from './utils/statusConverter';
 import { connectWebsocket } from '../websocket/redux/connectWebsocket';
 import { getDeployDetail } from './redux/getDeployDetail';
+import { manualPodDeploy } from './redux/manualPodDeploy';
 import './MainDeployDetailCard.css';
 
 const { Description } = DescriptionList;
@@ -38,13 +40,12 @@ class MainDeployDetailCard extends React.PureComponent {
     this.websocket = connectWebsocket(id);
   }
 
-
   componentDidUpdate(prevProps) {
     const {
       info: { error },
     } = this.props;
     if (!prevProps.error && error) {
-      console.log(error)
+      console.log(error);
       message.error(error);
     }
   }
@@ -130,14 +131,34 @@ class MainDeployDetailCard extends React.PureComponent {
     });
   }
 
-  handlePublish = item => {
-    console.log(item);
+  handleManual = item => {
+    const {
+      info: {
+        detail: { id },
+      },
+      manualPodDeploy,
+    } = this.props;
+
+    manualPodDeploy(id, item.id, () => {
+      message.success(`【${item.name}】标记为成功!`);
+    });
   };
+
+  /*handleMenuClick = (key, item) => {
+    switch (key) {
+      case 'manual':
+        // manualPodDeploy()
+        break;
+      default:
+        break;
+    }
+  };*/
 
   render() {
     const {
       info: {
         detail: { name },
+        loading,
       },
     } = this.props;
     const dataSource = this.getDataSource();
@@ -155,6 +176,7 @@ class MainDeployDetailCard extends React.PureComponent {
               dataSource={dataSource}
               rowKey={item => item.id}
               pagination={false}
+              loading={loading}
             >
               <Column title="ID" dataIndex="id" />
               <Column title="名称" dataIndex="name" />
@@ -177,22 +199,35 @@ class MainDeployDetailCard extends React.PureComponent {
                 key="action"
                 render={item => {
                   return (
-                    <span>
+                    <div>
                       <a onClick={() => this.handlePublish(item)}>发布</a>
                       <Divider type="vertical" />
+                      <Popconfirm
+                        title="确认标记为发布成功?"
+                        cancelText="取消"
+                        okText="确定"
+                        onConfirm={() => this.handleManual(item)}
+                      >
+                        <a href="#">标记成功</a>
+                      </Popconfirm>
+                      {/* <Divider type="vertical" /> 
                       <Dropdown
                         overlay={
-                          <Menu onClick={({ key }) => console.log(key)}>
-                            <Menu.Item key="delete">删除</Menu.Item>
+                          <Menu
+                            onClick={({ key }) =>
+                              this.handleMenuClick(key, item)
+                            }
+                          >
+                            <Menu.Item key="manual">标记成功</Menu.Item>
                           </Menu>
                         }
-                      >
-                        <a>
+                       > 
+                       <a>
                           更多 <Icon type="down" />
-                        </a>
-                      </Dropdown>
-                      {/* <a href="javascript:;">Delete</a> */}
-                    </span>
+                        </a> 
+                       </Dropdown>
+                      <a href="javascript:;">Delete</a>*/}
+                    </div>
                   );
                 }}
               />
@@ -219,6 +254,8 @@ function mapDispatchToProps(dispatch) {
       );
     },
     getDeployDetail: id => dispatch(getDeployDetail(id)),
+    manualPodDeploy: (id, pid, callback) =>
+      dispatch(manualPodDeploy(id, pid, callback)),
   };
 }
 

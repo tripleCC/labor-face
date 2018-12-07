@@ -178,8 +178,7 @@ class MainDeployList extends Component {
     }
   };
 
-  handleMenuClick = (event, item) => {
-    const { key } = event;
+  handleMenuClick = (key, item) => {
     const { deleteDeploy } = this.props;
     const getDeployList = this.getDeployList;
 
@@ -257,7 +256,7 @@ class MainDeployList extends Component {
             key="action"
             render={item => {
               return (
-                <span>
+                <div>
                   {item.statusConverter.hasDetail() && (
                     <span>
                       <Link to={`/deploys/${item.id}`}>详情</Link>
@@ -269,7 +268,7 @@ class MainDeployList extends Component {
                   <Dropdown
                     overlay={
                       <Menu
-                        onClick={event => this.handleMenuClick(event, item)}
+                        onClick={({ key }) => this.handleMenuClick(key, item)}
                       >
                         <Menu.Item key="delete">删除</Menu.Item>
                       </Menu>
@@ -280,7 +279,7 @@ class MainDeployList extends Component {
                     </a>
                   </Dropdown>
                   {/* <a href="javascript:;">Delete</a> */}
-                </span>
+                </div>
               );
             }}
           />
