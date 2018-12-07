@@ -69,7 +69,7 @@ class MainDeployDetailCard extends React.PureComponent {
           {should_push_ding ? '是' : '否'}
         </Description>
         <Description term="创建时间">
-          {new Date(created_at).toLocaleDateString()}
+          {!!created_at ? new Date(created_at).toLocaleDateString() : '未知'}
         </Description>
         <Description term="组件数量">{detailItems.length}</Description>
       </DescriptionList>

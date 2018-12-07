@@ -14,12 +14,14 @@ import {
   Icon,
   Modal,
   Badge,
+  Popconfirm,
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
 import { addDeploy } from './redux/addDeploy';
+import { deleteDeploy } from './redux/deleteDeploy';
 import AddMainDeployModal from './AddMainDeployModal';
 import StatusConverter from './utils/statusConverter';
 import './MainDeployList.css';
@@ -47,9 +49,9 @@ class MainDeployList extends Component {
     }
   }
 
-  getDeployList(page = 1, query = {}) {
+  getDeployList = (page = 1, query = {}) => {
     this.props.getDeployList(page, query);
-  }
+  };
 
   getDataSource() {
     const { items, byId } = this.props.info;
@@ -163,10 +165,39 @@ class MainDeployList extends Component {
     }
   };
 
+  handleMenuClick = (event, item) => {
+    const { key } = event;
+    const { deleteDeploy } = this.props;
+    const getDeployList = this.getDeployList;
+
+    switch (key) {
+      case 'delete':
+        confirm({
+          title: `确认删除【${item.name} (${item.id})】?`,
+          content: `删除【${item.name} (${
+            item.id
+          })】后，其下所有的组件发布都将被删除`,
+          okText: '确定',
+          cancelText: '取消',
+          onOk() {
+            deleteDeploy(item.id, () => {
+              message.success(`删除${item.name}成功!`);
+              getDeployList();
+            });
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   render() {
     const dataSource = this.getDataSource();
 
-    const { loading, perPage, total } = this.props.info;
+    const {
+      info: { loading, perPage, total },
+    } = this.props;
     const { addModalVisible } = this.state;
 
     const pagination = {
@@ -224,7 +255,9 @@ class MainDeployList extends Component {
                   <Divider type="vertical" />
                   <Dropdown
                     overlay={
-                      <Menu onClick={({ key }) => console.log(key)}>
+                      <Menu
+                        onClick={event => this.handleMenuClick(event, item)}
+                      >
                         <Menu.Item key="delete">删除</Menu.Item>
                       </Menu>
                     }
@@ -263,6 +296,7 @@ function mapDispatchToProps(dispatch) {
   return {
     getDeployList: (page, query) => dispatch(getDeployList(page, query)),
     addDeploy: (params, callback) => dispatch(addDeploy(params, callback)),
+    deleteDeploy: (id, callback) => dispatch(deleteDeploy(id, callback)),
   };
 }
 
