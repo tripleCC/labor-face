@@ -3,6 +3,7 @@ import { reducer as getDeployListReducer } from './getDeployList';
 import { reducer as getDeployDetailReducer } from './getDeployDetail';
 import { reducer as addDeployReducer } from './addDeploy';
 import { reducer as deleteDeployReducer } from './deleteDeploy';
+import { reducer as enqueueDeployReducer } from './enqueueDeploy';
 
 export const initialState = {
   loading: false,
@@ -24,6 +25,7 @@ const reducer = reduceReducers(
   getDeployDetailReducer,
   addDeployReducer,
   deleteDeployReducer,
+  enqueueDeployReducer,
 );
 
 export default reducer;

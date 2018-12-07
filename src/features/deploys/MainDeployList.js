@@ -22,6 +22,7 @@ import { withRouter } from 'react-router';
 import { getDeployList } from './redux/getDeployList';
 import { addDeploy } from './redux/addDeploy';
 import { deleteDeploy } from './redux/deleteDeploy';
+import { enqueueDeploy } from './redux/enqueueDeploy';
 import AddMainDeployModal from './AddMainDeployModal';
 import StatusConverter from './utils/statusConverter';
 import './MainDeployList.css';
@@ -151,7 +152,16 @@ class MainDeployList extends Component {
     });
   };
 
+  enqueueDeploy = (id) => {
+    const { enqueueDeploy, history } = this.props;
+
+    enqueueDeploy(id, () => {
+      history.push(`/deploys/${id}`);
+    });
+  }
+
   handleAnalyze = item => {
+    const enqueueDeploy = this.enqueueDeploy;
     if (item.statusConverter.hasDetail()) {
       confirm({
         title: '确认重新分析依赖?',
@@ -159,9 +169,12 @@ class MainDeployList extends Component {
           '重新分析依赖关系会覆盖旧发布信息，其下所有组件发布状态都将重置为待分析状态',
         okText: '确定',
         cancelText: '取消',
-        onOk() {},
+        onOk() {
+          enqueueDeploy(item.id);
+        },
       });
     } else {
+      enqueueDeploy(item.id);
     }
   };
 
@@ -297,6 +310,7 @@ function mapDispatchToProps(dispatch) {
     getDeployList: (page, query) => dispatch(getDeployList(page, query)),
     addDeploy: (params, callback) => dispatch(addDeploy(params, callback)),
     deleteDeploy: (id, callback) => dispatch(deleteDeploy(id, callback)),
+    enqueueDeploy: (id, callback) => dispatch(enqueueDeploy(id, callback)),
   };
 }
 
