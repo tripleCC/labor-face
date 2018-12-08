@@ -5,11 +5,6 @@ import {
   DEPLOYS_MANUAL_POD_DEPLOY_FAILURE,
 } from './constants';
 
-import {
-  beginContentSpin,
-  endContentSpin,
-} from '../../common/redux/showContentSpin';
-
 import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
 

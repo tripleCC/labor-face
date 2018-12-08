@@ -14,7 +14,6 @@ import {
   Icon,
   Modal,
   Badge,
-  Popconfirm,
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';

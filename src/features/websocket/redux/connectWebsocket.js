@@ -2,23 +2,17 @@ import {
   WEBSOCKET_ON_OPEN,
   WEBSOCKET_ON_CLOSE,
   WEBSOCKET_ON_MESSAGE,
+  WEBSOCKET_ON_ERROR,
 } from './constants';
 
 import { WEBSOCKET_HOST } from '../../../common/constants';
-
-const initialState = {
-  module: null,
-  id: null,
-  data: null,
-  type: null,
-  errorCode: null,
-  errorReason: null,
-  eventWasClean: null,
-};
+import { initialState } from './reducer';
 
 // Action
 function connectWebsocket(dispatch, module, id) {
-  const websocket = new WebSocket(`${WEBSOCKET_HOST}?module=${module}&id=${id}`);
+  const websocket = new WebSocket(
+    `${WEBSOCKET_HOST}?module=${module}&id=${id}`,
+  );
 
   websocket.onopen = () => {
     dispatch({
@@ -32,13 +26,14 @@ function connectWebsocket(dispatch, module, id) {
 
   websocket.onmessage = event => {
     const json = JSON.parse(event.data);
+    console.log(json);
     dispatch({
       type: WEBSOCKET_ON_MESSAGE,
       data: {
         module: module,
         id: id,
         data: json.data,
-        type: json.type,
+        type: json.meta.type,
       },
     });
   };
@@ -48,9 +43,25 @@ function connectWebsocket(dispatch, module, id) {
       data: {
         module: module,
         id: id,
-        errorCode: event.code,
-        errorReason: event.reason,
-        eventWasClean: event.wasClean,
+        error: {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        },
+      },
+    });
+  };
+  websocket.onerror = event => {
+    dispatch({
+      type: WEBSOCKET_ON_ERROR,
+      data: {
+        module: module,
+        id: id,
+        error: {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        },
       },
     });
   };
@@ -60,7 +71,7 @@ function connectWebsocket(dispatch, module, id) {
 
 // Reducer
 function reducer(state = initialState, action) {
-  const {data} = action;
+  const { data } = action;
   switch (action.type) {
     case WEBSOCKET_ON_OPEN:
       return {
@@ -74,20 +85,22 @@ function reducer(state = initialState, action) {
         module: data.module,
         id: data.id,
         data: data.data,
-        type: data.type,
-        errorCode: null,
-        errorReason: null,
-        eventWasClean: null,
+        meta: data.meta,
+        error: null,
       };
     case WEBSOCKET_ON_CLOSE:
       return {
         ...state,
         module: data.module,
         id: data.id,
-        errorCode: data.errorCode,
-        errorReason: data.errorReason,
-        eventWasClean: data.eventWasClean,
-        // errorCode: action.
+        error: data.error,
+      };
+    case WEBSOCKET_ON_ERROR:
+      return {
+        ...state,
+        module: data.module,
+        id: data.id,
+        error: data.error,
       };
     default:
       return state;

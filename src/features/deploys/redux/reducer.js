@@ -5,6 +5,7 @@ import { reducer as addDeployReducer } from './addDeploy';
 import { reducer as deleteDeployReducer } from './deleteDeploy';
 import { reducer as enqueueDeployReducer } from './enqueueDeploy';
 import { reducer as manualPodDeployReducer } from './manualPodDeploy';
+import { reducer as processDeployMessageReducer } from './processDeployMessage';
 
 export const initialState = {
   loading: false,
@@ -19,6 +20,9 @@ export const initialState = {
   detail: {},
   detailItems: [],
   detailById: {},
+
+  messageModule: null,
+  messageId: null
 };
 
 const reducer = reduceReducers(
@@ -28,6 +32,7 @@ const reducer = reduceReducers(
   deleteDeployReducer,
   enqueueDeployReducer,
   manualPodDeployReducer,
+  processDeployMessageReducer,
 );
 
 export default reducer;

@@ -42,6 +42,8 @@ function getDeployDetail(id) {
 
 // Reducer
 function reducer(state = initialState, action) {
+  
+
   switch (action.type) {
     case DEPLOYS_GET_DEPLOY_DETAIL_BEGIN:
       return {

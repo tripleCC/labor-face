@@ -15,9 +15,8 @@ import {
   Popconfirm,
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
-import { WEBSOCKET_LABOR_DEPLOY_PROCESS_MODULE } from '../websocket/redux/constants';
 import StatusConverter from './utils/statusConverter';
-import { connectWebsocket } from '../websocket/redux/connectWebsocket';
+import { connectWebsocket } from './redux/processDeployMessage';
 import { getDeployDetail } from './redux/getDeployDetail';
 import { manualPodDeploy } from './redux/manualPodDeploy';
 import './MainDeployDetailCard.css';
@@ -45,7 +44,6 @@ class MainDeployDetailCard extends React.PureComponent {
       info: { error },
     } = this.props;
     if (!prevProps.error && error) {
-      console.log(error);
       message.error(error);
     }
   }
@@ -124,6 +122,7 @@ class MainDeployDetailCard extends React.PureComponent {
     const {
       info: { detailItems, detailById },
     } = this.props;
+
     if (!detailItems) return [];
     return detailItems.map(id => {
       let item = detailById[id];
@@ -246,13 +245,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    connectWebsocket: id => {
-      return connectWebsocket(
-        dispatch,
-        WEBSOCKET_LABOR_DEPLOY_PROCESS_MODULE,
-        id,
-      );
-    },
+    connectWebsocket: id => connectWebsocket(dispatch, id),
     getDeployDetail: id => dispatch(getDeployDetail(id)),
     manualPodDeploy: (id, pid, callback) =>
       dispatch(manualPodDeploy(id, pid, callback)),
