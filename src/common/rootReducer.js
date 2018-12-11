@@ -4,6 +4,7 @@ import deploysReducer from '../features/deploys/redux/reducer';
 import commonReducer from '../features/common/redux/reducer';
 import userReducer from '../features/user/redux/reducer';
 import websocketReducer from '../features/websocket/redux/reducer';
+import operationsReducer from '../features/operations/redux/reducer';
 
 export default history =>
   combineReducers({
@@ -12,5 +13,6 @@ export default history =>
     common: commonReducer,
     user: userReducer,
     websocket: websocketReducer,
+    operations: operationsReducer,
     // rest of your reducers
   });
