@@ -13,6 +13,7 @@ import {
   Card,
   message,
   Popconfirm,
+  Modal
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
 import StatusConverter from './utils/statusConverter';
@@ -21,11 +22,13 @@ import { getDeployDetail } from './redux/getDeployDetail';
 import { manualPodDeploy } from './redux/manualPodDeploy';
 import { enqueuePodDeploy } from './redux/enqueuePodDeploy';
 import { cancelPodDeploy } from './redux/cancelPodDeploy';
+import { cancelDeploy } from './redux/cancelDeploy';
 import './MainDeployDetailCard.css';
 
 const { Description } = DescriptionList;
 const { Column } = Table;
 const ButtonGroup = Button.Group;
+const confirm = Modal.confirm;
 
 class MainDeployDetailCard extends React.PureComponent {
   componentDidMount() {
@@ -94,9 +97,33 @@ class MainDeployDetailCard extends React.PureComponent {
     );
   }
 
+  handHeaderAction = key => {
+    const {
+      info: {
+        detail: { id },
+      },
+      cancelDeploy,
+    } = this.props;
+    switch (key) {
+      case 'cancel':
+        confirm({
+          title: '确认取消发布?',
+          content: '其下所有组件都将取消发布',
+          okText: '确定',
+          cancelText: '取消',
+          onOk() {
+            cancelDeploy(id);
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   renderAction() {
     const menu = (
-      <Menu>
+      <Menu onClick={({ key }) => this.handHeaderAction(key)}>
         <Menu.Item key="cancel">取消发布</Menu.Item>
         <Menu.Item key="validate-version">校验组件版本</Menu.Item>
         <Menu.Item key="save-version">保存组件版本</Menu.Item>
@@ -276,6 +303,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    cancelDeploy: (id, callback) => dispatch(cancelDeploy(id, callback)),
     cancelPodDeploy: (id, pid, callback) =>
       dispatch(cancelPodDeploy(id, pid, callback)),
     enqueuePodDeploy: (id, pid, callback) =>

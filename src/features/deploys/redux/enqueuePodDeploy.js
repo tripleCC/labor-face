@@ -5,10 +5,6 @@ import {
   DEPLOYS_ENQUEUE_POD_DEPLOY_BEGIN,
 } from './constants';
 
-import {
-  beginContentSpin,
-  endContentSpin,
-} from '../../common/redux/showContentSpin';
 
 import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
@@ -21,7 +17,6 @@ function enqueuePodDeploy(id, pid, callback) {
     });
     return axios.post(`${SERVER_HOST}/deploys/${id}/pods/${pid}/enqueue`).then(
       res => {
-        endContentSpin(dispatch);
         dispatch({
           type: DEPLOYS_ENQUEUE_POD_DEPLOY_SUCCESS,
           data: res.data.data,
@@ -29,7 +24,6 @@ function enqueuePodDeploy(id, pid, callback) {
         if (callback) callback();
       },
       err => {
-        endContentSpin(dispatch);
         dispatch({
           type: DEPLOYS_ENQUEUE_POD_DEPLOY_FAILURE,
           data: !err.response
