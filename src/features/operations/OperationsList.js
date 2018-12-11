@@ -51,7 +51,7 @@ class OperationsList extends Component {
     if (!items) return [];
     return items.map(id => {
       let item = byId[id];
-      return { ...item};
+      return { ...item };
     });
   }
 
@@ -104,9 +104,15 @@ class OperationsList extends Component {
           // onChange=
         >
           <Column title="ID" dataIndex="id" />
-          <Column title="名称" dataIndex="deploy.name" />
+          <Column title="名称" dataIndex="deploy_name" />
+          <Column title="类型" dataIndex="deploy_type" />
           <Column title="操作人" dataIndex="user.nickname" />
           <Column title="操作" dataIndex="name" />
+          <Column
+            title="操作时间"
+            dataIndex="created_at"
+            render={time => new Date(time).toLocaleString()}
+          />
         </Table>
       </div>
     );
