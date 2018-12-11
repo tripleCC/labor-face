@@ -161,7 +161,7 @@ class MainDeployList extends Component {
 
   handleAnalyze = item => {
     const enqueueDeploy = this.enqueueDeploy;
-    if (item.statusConverter.hasDetail()) {
+    if (item.statusConverter.getHasDetail()) {
       confirm({
         title: '确认重新分析依赖?',
         content:
@@ -256,7 +256,7 @@ class MainDeployList extends Component {
             render={item => {
               return (
                 <div>
-                  {item.statusConverter.hasDetail() && (
+                  {item.statusConverter.getHasDetail() && (
                     <span>
                       <Link to={`/deploys/${item.id}`}>详情</Link>
                       <Divider type="vertical" />

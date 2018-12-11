@@ -39,8 +39,16 @@ class StatusConverter {
     return 'default';
   }
 
-  hasDetail() {
+  getHasDetail() {
     return this.status !== 'created'
+  }
+
+  getCanCancel() {
+    return ['pending', 'merged', 'deploying', 'analyzing'].includes(this.status)
+  }
+
+  getCanRetry() {
+    return ['failed', 'canceled', 'skipped'].includes(this.status)
   }
 }
 

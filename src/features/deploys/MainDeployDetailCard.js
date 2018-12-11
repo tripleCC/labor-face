@@ -19,6 +19,8 @@ import StatusConverter from './utils/statusConverter';
 import { connectWebsocket } from './redux/processDeployMessage';
 import { getDeployDetail } from './redux/getDeployDetail';
 import { manualPodDeploy } from './redux/manualPodDeploy';
+import { enqueuePodDeploy } from './redux/enqueuePodDeploy';
+import { cancelPodDeploy } from './redux/cancelPodDeploy';
 import './MainDeployDetailCard.css';
 
 const { Description } = DescriptionList;
@@ -143,15 +145,31 @@ class MainDeployDetailCard extends React.PureComponent {
     });
   };
 
-  /*handleMenuClick = (key, item) => {
-    switch (key) {
-      case 'manual':
-        // manualPodDeploy()
-        break;
-      default:
-        break;
-    }
-  };*/
+  handlePublish = item => {
+    const {
+      info: {
+        detail: { id },
+      },
+      enqueuePodDeploy,
+    } = this.props;
+
+    enqueuePodDeploy(id, item.id, () => {
+      message.success(`开始发布【${item.name}】!`);
+    });
+  };
+
+  handleCancel = item => {
+    const {
+      info: {
+        detail: { id },
+      },
+      cancelPodDeploy,
+    } = this.props;
+
+    cancelPodDeploy(id, item.id, () => {
+      message.success(`【${item.name}】取消成功!`);
+    });
+  };
 
   render() {
     const {
@@ -199,7 +217,20 @@ class MainDeployDetailCard extends React.PureComponent {
                 render={item => {
                   return (
                     <div>
-                      <a onClick={() => this.handlePublish(item)}>发布</a>
+                      {item.statusConverter.getCanCancel() ? (
+                        <Popconfirm
+                          title="确认取消发布?"
+                          cancelText="取消"
+                          okText="确定"
+                          onConfirm={() => this.handleCancel(item)}
+                        >
+                          <a>取消</a>
+                        </Popconfirm>
+                      ) : (
+                        <a onClick={() => this.handlePublish(item)}>
+                          {item.statusConverter.getCanRetry() ? '重试' : '发布'}
+                        </a>
+                      )}
                       <Divider type="vertical" />
                       <Popconfirm
                         title="确认标记为发布成功?"
@@ -245,6 +276,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    cancelPodDeploy: (id, pid, callback) =>
+      dispatch(cancelPodDeploy(id, pid, callback)),
+    enqueuePodDeploy: (id, pid, callback) =>
+      dispatch(enqueuePodDeploy(id, pid, callback)),
     connectWebsocket: id => connectWebsocket(dispatch, id),
     getDeployDetail: id => dispatch(getDeployDetail(id)),
     manualPodDeploy: (id, pid, callback) =>
