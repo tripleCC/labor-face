@@ -9,6 +9,7 @@ import { reducer as processDeployMessageReducer } from './processDeployMessage';
 import { reducer as enqueuePodDeployReducer } from './enqueuePodDeploy';
 import { reducer as cancelPodDeployReducer } from './cancelPodDeploy';
 import { reducer as cancelDeployReducer } from './cancelDeploy';
+import { reducer as startDeployReducer } from './startDeploy';
 
 export const initialState = {
   loading: false,
@@ -39,6 +40,7 @@ const reducer = reduceReducers(
   enqueuePodDeployReducer,
   cancelPodDeployReducer,
   cancelDeployReducer,
+  startDeployReducer
 );
 
 export default reducer;

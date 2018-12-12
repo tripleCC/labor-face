@@ -13,7 +13,8 @@ import {
   Card,
   message,
   Popconfirm,
-  Modal
+  Modal,
+  Popover,
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
 import StatusConverter from './utils/statusConverter';
@@ -23,6 +24,7 @@ import { manualPodDeploy } from './redux/manualPodDeploy';
 import { enqueuePodDeploy } from './redux/enqueuePodDeploy';
 import { cancelPodDeploy } from './redux/cancelPodDeploy';
 import { cancelDeploy } from './redux/cancelDeploy';
+import { startDeploy } from './redux/startDeploy';
 import './MainDeployDetailCard.css';
 
 const { Description } = DescriptionList;
@@ -122,6 +124,13 @@ class MainDeployDetailCard extends React.PureComponent {
   };
 
   renderAction() {
+    const {
+      info: {
+        detail: { id, status },
+      },
+      startDeploy,
+    } = this.props;
+
     const menu = (
       <Menu onClick={({ key }) => this.handHeaderAction(key)}>
         <Menu.Item key="cancel">取消发布</Menu.Item>
@@ -129,6 +138,8 @@ class MainDeployDetailCard extends React.PureComponent {
         <Menu.Item key="save-version">保存组件版本</Menu.Item>
       </Menu>
     );
+
+    const statusConverter = new StatusConverter(status);
 
     return (
       <div>
@@ -142,7 +153,13 @@ class MainDeployDetailCard extends React.PureComponent {
             <Icon type="ellipsis" />
           </Button>
         </Dropdown>
-        <Button type="primary">自动发布</Button>
+        <Button
+          type="primary"
+          onClick={() => startDeploy(id)}
+          disabled={statusConverter.getCanCancel()}
+        >
+          {statusConverter.getCanRetry() ? '重试' : '自动发布'}
+        </Button>
       </div>
     );
   }
@@ -223,7 +240,29 @@ class MainDeployDetailCard extends React.PureComponent {
               loading={loading}
             >
               <Column title="ID" dataIndex="id" />
-              <Column title="名称" dataIndex="name" />
+              <Column
+                title="名称"
+                key="name"
+                render={item => {
+                  return (
+                    <Popover
+                      placement="top"
+                      title={'依赖发布组件'}
+                      content={
+                        <div className="mddc-popover">
+                          {item.external_dependency_names.length
+                            ? item.external_dependency_names.map(name => {
+                                return `【${name}】`;
+                              })
+                            : '无'}
+                        </div>
+                      }
+                    >
+                      {item.name}
+                    </Popover>
+                  );
+                }}
+              />
               <Column title="分支" dataIndex="ref" />
               <Column
                 title="负责人"
@@ -232,9 +271,30 @@ class MainDeployDetailCard extends React.PureComponent {
               />
               <Column
                 title="状态"
-                dataIndex="statusConverter"
-                render={status => {
-                  return <Badge status={status.badge} text={status.text} />;
+                key="status"
+                render={item => {
+                  const badge = (
+                    <Badge
+                      status={item.statusConverter.badge}
+                      text={item.statusConverter.text}
+                    />
+                  );
+                  return item.statusConverter.isFailed() ? (
+                    <Popover
+                      placement="top"
+                      title={'错误原因'}
+                      content={
+                        <div className="mddc-popover">
+                          {item.failure_reason}
+                        </div>
+                      }
+                    >
+                      {badge}
+                    </Popover>
+                  ) : (
+                    badge
+                  );
+                  // return <Badge status={status.badge} text={status.text} />;
                 }}
               />
               <Column title="版本" dataIndex="version" />
@@ -303,6 +363,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    startDeploy: (id, callback) => dispatch(startDeploy(id, callback)),
     cancelDeploy: (id, callback) => dispatch(cancelDeploy(id, callback)),
     cancelPodDeploy: (id, pid, callback) =>
       dispatch(cancelPodDeploy(id, pid, callback)),

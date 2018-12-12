@@ -51,3 +51,7 @@
 .main-deploy-detail-card-item-title {}
 
 .main-deploy-detail-card-item-text {}
+
+.mddc-popover {
+    max-width: 500px;
+}

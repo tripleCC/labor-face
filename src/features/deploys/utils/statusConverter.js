@@ -39,6 +39,10 @@ class StatusConverter {
     return 'default';
   }
 
+  isFailed() {
+    return this.status === 'failed'
+  }
+
   getHasDetail() {
     return this.status !== 'created'
   }
