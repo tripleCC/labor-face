@@ -1,6 +1,8 @@
 const statusTextMapper = {
   created: '待分析',
   analyzing: '分析中',
+  waiting: '待发布',
+  preparing: '准备中',
   skipped: '已忽略',
   pending: '等待中',
   merged: '已合并',
@@ -12,10 +14,10 @@ const statusTextMapper = {
 
 const statusBadgeMapper = new Map([
   ['success', ['success']],
-  ['processing', ['deploying', 'analyzing', 'merged']],
+  ['processing', ['deploying', 'analyzing', 'merged', 'preparing']],
   ['default', ['created', 'canceled', 'skipped']],
   ['error', ['failed']],
-  ['warning', ['pending']],
+  ['warning', ['pending', 'waiting']],
 ]);
 
 class StatusConverter {
@@ -43,12 +45,16 @@ class StatusConverter {
     return this.status === 'failed'
   }
 
+  canPublish() {
+    return this.status === 'waiting'
+  }
+
   getHasDetail() {
     return this.status !== 'created'
   }
 
   getCanCancel() {
-    return ['pending', 'merged', 'deploying', 'analyzing'].includes(this.status)
+    return ['pending', 'merged', 'deploying', 'preparing'].includes(this.status)
   }
 
   getCanRetry() {

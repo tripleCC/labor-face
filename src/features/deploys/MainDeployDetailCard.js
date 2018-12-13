@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import semver from 'semver';
 import {
   Row,
   Col,
@@ -15,6 +16,7 @@ import {
   Popconfirm,
   Modal,
   Popover,
+  Input,
 } from 'antd';
 import { PageHeader, DescriptionList } from 'ant-design-pro';
 import StatusConverter from './utils/statusConverter';
@@ -25,6 +27,7 @@ import { enqueuePodDeploy } from './redux/enqueuePodDeploy';
 import { cancelPodDeploy } from './redux/cancelPodDeploy';
 import { cancelDeploy } from './redux/cancelDeploy';
 import { startDeploy } from './redux/startDeploy';
+import { updatePodVersions } from './redux/updatePodVersions';
 import './MainDeployDetailCard.css';
 
 const { Description } = DescriptionList;
@@ -32,7 +35,11 @@ const { Column } = Table;
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 
-class MainDeployDetailCard extends React.PureComponent {
+class MainDeployDetailCard extends React.Component {
+  state = {
+    editedItems: new Map(),
+  };
+
   componentDidMount() {
     const {
       match: {
@@ -110,7 +117,7 @@ class MainDeployDetailCard extends React.PureComponent {
       case 'cancel':
         confirm({
           title: '确认取消发布?',
-          content: '其下所有组件都将取消发布',
+          content: '其下所有可取消组件都将取消发布',
           okText: '确定',
           cancelText: '取消',
           onOk() {
@@ -153,13 +160,19 @@ class MainDeployDetailCard extends React.PureComponent {
             <Icon type="ellipsis" />
           </Button>
         </Dropdown>
-        <Button
-          type="primary"
-          onClick={() => startDeploy(id)}
-          disabled={statusConverter.getCanCancel()}
-        >
-          {statusConverter.getCanRetry() ? '重试' : '自动发布'}
-        </Button>
+        {statusConverter.getCanRetry() ? (
+          <Button type="primary" onClick={() => startDeploy(id)}>
+            重试
+          </Button>
+        ) : (
+          <Button
+            type="primary"
+            onClick={() => startDeploy(id)}
+            disabled={!statusConverter.canPublish()}
+          >
+            自动发布
+          </Button>
+        )}
       </div>
     );
   }
@@ -215,6 +228,58 @@ class MainDeployDetailCard extends React.PureComponent {
     });
   };
 
+  handleMoreClick = (key, item) => {
+    switch (key) {
+      case 'edit':
+        const { editedItems } = this.state;
+        editedItems.set(item.id, item);
+        this.setState({ editedItems: editedItems });
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleFieldChange = (e, fieldName, key) => {
+    const { editedItems } = this.state;
+    const item = editedItems.get(key);
+    item[fieldName] = e.target.value;
+    this.setState({ editedItems: editedItems });
+  };
+
+  handleKeyPress = (e, key) => {
+    if (e.key === 'Enter') {
+      this.saveRow(e, key);
+    }
+  };
+
+  saveRow(e, key) {
+    const { updatePodVersions } = this.props;
+    const { editedItems } = this.state;
+    const item = editedItems.get(key);
+
+    if (!semver.valid(item.version)) {
+      message.warning(`【${item.name}】版本【${item.version}】不符合 Sematic Versioning!`)
+      return;
+    }
+    updatePodVersions(
+      {
+        [key]: item.version,
+      },
+      () => {
+        editedItems.delete(key);
+        this.setState({ editedItems: editedItems });
+        message.success(`更新【${item.name}】版本成功!`);
+      },
+    );
+  }
+
+  cancelRow(e, key) {
+    const { editedItems } = this.state;
+    editedItems.delete(key);
+    this.setState({ editedItems: editedItems });
+  }
+
   render() {
     const {
       info: {
@@ -222,7 +287,14 @@ class MainDeployDetailCard extends React.PureComponent {
         loading,
       },
     } = this.props;
-    const dataSource = this.getDataSource();
+    const { editedItems } = this.state;
+    const editedItemIds = [...editedItems.keys()];
+    const dataSource = this.getDataSource().map(item => {
+      return editedItemIds.includes(item.id)
+        ? { ...editedItems.get(item.id), editable: true }
+        : { ...item, editable: false };
+    });
+
     return (
       <div>
         <PageHeader
@@ -247,7 +319,7 @@ class MainDeployDetailCard extends React.PureComponent {
                   return (
                     <Popover
                       placement="top"
-                      title={'依赖发布组件'}
+                      title="依赖发布组件"
                       content={
                         <div className="mddc-popover">
                           {item.external_dependency_names.length
@@ -297,13 +369,41 @@ class MainDeployDetailCard extends React.PureComponent {
                   // return <Badge status={status.badge} text={status.text} />;
                 }}
               />
-              <Column title="版本" dataIndex="version" />
+              <Column
+                title="版本"
+                dataIndex="version"
+                render={(version, item) => {
+                  if (item.editable) {
+                    return (
+                      <Input
+                        value={version}
+                        autoFocus
+                        onChange={e =>
+                          this.handleFieldChange(e, 'version', item.id)
+                        }
+                        onKeyPress={e => this.handleKeyPress(e, item.id)}
+                        placeholder="Semantic Versioning"
+                      />
+                    );
+                  }
+                  return version;
+                }}
+              />
               <Column
                 title="操作"
                 key="action"
                 render={item => {
+                  if (item.editable) {
+                    return (
+                      <span>
+                        <a onClick={e => this.saveRow(e, item.id)}>保存</a>
+                        <Divider type="vertical" />
+                        <a onClick={e => this.cancelRow(e, item.id)}>取消</a>
+                      </span>
+                    );
+                  }
                   return (
-                    <div>
+                    <span>
                       {item.statusConverter.getCanCancel() ? (
                         <Popconfirm
                           title="确认取消发布?"
@@ -327,24 +427,23 @@ class MainDeployDetailCard extends React.PureComponent {
                       >
                         <a href="#">标记成功</a>
                       </Popconfirm>
-                      {/* <Divider type="vertical" /> 
+                      <Divider type="vertical" />
                       <Dropdown
                         overlay={
                           <Menu
                             onClick={({ key }) =>
-                              this.handleMenuClick(key, item)
+                              this.handleMoreClick(key, item)
                             }
                           >
-                            <Menu.Item key="manual">标记成功</Menu.Item>
+                            <Menu.Item key="edit">编辑</Menu.Item>
                           </Menu>
                         }
-                       > 
-                       <a>
+                      >
+                        <a>
                           更多 <Icon type="down" />
-                        </a> 
-                       </Dropdown>
-                      <a href="javascript:;">Delete</a>*/}
-                    </div>
+                        </a>
+                      </Dropdown>
+                    </span>
                   );
                 }}
               />
@@ -363,6 +462,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    updatePodVersions: (params, callback) =>
+      dispatch(updatePodVersions(params, callback)),
     startDeploy: (id, callback) => dispatch(startDeploy(id, callback)),
     cancelDeploy: (id, callback) => dispatch(cancelDeploy(id, callback)),
     cancelPodDeploy: (id, pid, callback) =>

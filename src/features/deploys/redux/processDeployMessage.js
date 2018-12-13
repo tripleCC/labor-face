@@ -82,7 +82,7 @@ function reducer(state = initialState, action) {
     case DEPLOYS_WEBSOCKET_ON_MESSAGE:
       const { message } = data;
       const { detailById } = state;
-      
+
       switch (data.type) {
         case DEPLOYS_LABOR_DEPLOY_PROCESS_MAIN_TYPE:
           return {
