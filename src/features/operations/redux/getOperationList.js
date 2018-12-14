@@ -9,7 +9,7 @@ import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
 
 // Action
-function getOperationList(page = 1, query = {}, perPage = 8) {
+function getOperationList(page = 1, query = {}, perPage = 15) {
   return dispatch => {
     dispatch({
       type: OPERATIONS_GET_OPERATION_LIST_BEGIN,
