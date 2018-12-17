@@ -57,7 +57,7 @@ class MainDeployDetailCard extends React.Component {
     const {
       info: { error },
     } = this.props;
-    if (!prevProps.error && error) {
+    if (!prevProps.info.error && error) {
       message.error(error);
     }
   }
