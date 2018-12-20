@@ -259,7 +259,9 @@ class MainDeployDetailCard extends React.Component {
     const item = editedItems.get(key);
 
     if (!semver.valid(item.version)) {
-      message.warning(`【${item.name}】版本【${item.version}】不符合 Sematic Versioning!`)
+      message.warning(
+        `【${item.name}】版本【${item.version}】不符合 Sematic Versioning!`,
+      );
       return;
     }
     updatePodVersions(
@@ -330,7 +332,7 @@ class MainDeployDetailCard extends React.Component {
                         </div>
                       }
                     >
-                      {item.name}
+                      <a target="_blank" href={item.project && item.project.web_url}>{item.name}</a>
                     </Popover>
                   );
                 }}
