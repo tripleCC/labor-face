@@ -2,27 +2,13 @@ import React, { Component } from 'react';
 import {
   Table,
   Form,
-  Select,
-  Button,
-  Col,
-  Row,
-  Input,
   message,
-  Divider,
-  Dropdown,
-  Menu,
-  Icon,
-  Modal,
-  Badge,
 } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getOperationList } from './redux/getOperationList';
 
-const FormItem = Form.Item;
-const { Option } = Select;
 const { Column } = Table;
-const confirm = Modal.confirm;
 
 class OperationsList extends Component {
   state = {
@@ -37,7 +23,7 @@ class OperationsList extends Component {
     const {
       info: { error },
     } = this.props;
-    if (!prevProps.error && error) {
+    if (!prevProps.info.error && error) {
       message.error(error);
     }
   }
