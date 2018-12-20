@@ -26,7 +26,7 @@ class HomeLayout extends React.Component {
     return (
       <Layout style={{ minHeight: '100vh' }}>
         <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
-          <div className="logo" />
+          <div className="logo"> ʕ•̫͡•ʔ-̫͡-ʕ•͓͡•ʔ</div>
           <Menu theme="dark" mode="inline" selectedKeys={[matchPathname]}>
             <Menu.Item key="/deploys">
               <Link to="/deploys">
@@ -35,7 +35,7 @@ class HomeLayout extends React.Component {
               </Link>
             </Menu.Item>
             <Menu.Item key="/operations">
-            <Link to="/operations">
+              <Link to="/operations">
                 <Icon type="hdd" />
                 <span>操作记录</span>
               </Link>

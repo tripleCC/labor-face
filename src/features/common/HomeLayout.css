@@ -12,8 +12,13 @@
 
 .logo {
     height: 32px;
-    background: rgba(255, 255, 255, .2);
+    // background: rgba(255, 255, 255, .2);
     margin: 16px;
+    text-align: center;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif
 }
 
 .hl-padding-content {
