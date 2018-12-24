@@ -92,7 +92,7 @@ function reducer(state = initialState, action) {
         case DEPLOYS_LABOR_DEPLOY_PROCESS_POD_TYPE:
           return {
             ...state,
-            detailById: {...detailById, [message.id]: message}
+            detailById: {...detailById, [message.id]: {...message, project: detailById[message.id].project}}
           };
         default:
           return state;
