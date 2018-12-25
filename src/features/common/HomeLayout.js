@@ -40,6 +40,12 @@ class HomeLayout extends React.Component {
                 <span>操作记录</span>
               </Link>
             </Menu.Item>
+            <Menu.Item key="/ci-status">
+              <Link to="/ci-status">
+                <Icon type="hdd" />
+                <span>CI状态</span>
+              </Link>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout>

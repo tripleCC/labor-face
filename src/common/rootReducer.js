@@ -5,6 +5,7 @@ import commonReducer from '../features/common/redux/reducer';
 import userReducer from '../features/user/redux/reducer';
 import websocketReducer from '../features/websocket/redux/reducer';
 import operationsReducer from '../features/operations/redux/reducer';
+import ciReducer from '../features/ci/redux/reducer';
 
 export default history =>
   combineReducers({
@@ -14,5 +15,6 @@ export default history =>
     user: userReducer,
     websocket: websocketReducer,
     operations: operationsReducer,
+    ci: ciReducer,
     // rest of your reducers
   });
