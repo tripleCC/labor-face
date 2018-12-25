@@ -1,5 +1,5 @@
-// export const SERVER_HOST = 'http://labor-labor.app.2dfire.com'
-export const SERVER_HOST = 'http://localhost:8080';
+export const SERVER_HOST = 'http://labor-labor.app.2dfire.com'
+// export const SERVER_HOST = 'http://localhost:8080';
 
 export const WEBSOCKET_HOST = 'ws://labor-socket-server-labor.app.2dfire.com';
 // export const WEBSOCKET_HOST = 'ws://localhost:8081';
