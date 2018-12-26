@@ -36,14 +36,14 @@ class HomeLayout extends React.Component {
             </Menu.Item>
             <Menu.Item key="/operations">
               <Link to="/operations">
-                <Icon type="hdd" />
+                <Icon type="tool" />
                 <span>操作记录</span>
               </Link>
             </Menu.Item>
             <Menu.Item key="/ci-status">
               <Link to="/ci-status">
-                <Icon type="hdd" />
-                <span>CI状态</span>
+                <Icon type="car" />
+                <span>CI 状态</span>
               </Link>
             </Menu.Item>
           </Menu>

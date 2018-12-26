@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   Table,
-  Form,
   message,
 } from 'antd';
 import { connect } from 'react-redux';
@@ -124,5 +123,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(Form.create()(OperationsList)),
+  )(OperationsList),
 );

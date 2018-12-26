@@ -1,15 +1,33 @@
 import React, { Component } from 'react';
-import { Table, Form, message } from 'antd';
+import {
+  Table,
+  Form,
+  Select,
+  Button,
+  Col,
+  Row,
+  Input,
+  message,
+  AutoComplete,
+} from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getCiStatusList } from './redux/getCiStatusList';
+import './CiStatusList.css';
 
 const { Column } = Table;
+const FormItem = Form.Item;
+const { Option } = Select;
 
 class CiStatusList extends Component {
   state = {
     addModalVisible: false,
+    teams: [],
+    owners: [],
   };
+
+  perPage = 10;
+  query = {};
 
   componentDidMount() {
     this.getCiStatusList();
@@ -33,38 +51,115 @@ class CiStatusList extends Component {
     });
   }
 
-  // handleSearch = e => {
-  //   e.preventDefault();
+  renderSearchCard() {
+    const {
+      form: { getFieldDecorator },
+      info: { loading, teams, owners },
+    } = this.props;
 
-  //   const { form } = this.props;
-  //   form.validateFields((err, fieldsValue) => {
-  //     if (err) return;
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline">
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+            <FormItem label="组件名称">
+              {getFieldDecorator('name')(
+                <Input placeholder="请输入组件名称" />,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="业务组">
+              {getFieldDecorator('team')(
+                <AutoComplete
+                  dataSource={
+                    this.state.teams.length > 0 ? this.state.teams : teams
+                  }
+                  onSearch={value => {
+                    this.setState({
+                      teams: value
+                        ? teams.filter(team => team.includes(value))
+                        : teams,
+                    });
+                  }}
+                  placeholder="请输入业务组"
+                />,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
+            <FormItem label="负责人">
+              {getFieldDecorator('owner')(
+                <AutoComplete
+                  dataSource={
+                    this.state.owners.length > 0 ? this.state.owners : owners
+                  }
+                  onSearch={value => {
+                    this.setState({
+                      owners: value
+                        ? owners.filter(owner => owner.includes(value))
+                        : owners,
+                    });
+                  }}
+                  placeholder="请输入负责人"
+                />,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={5} sm={24}>
+            <FormItem>
+              <span>
+                <Button type="primary" htmlType="submit" disabled={loading}>
+                  查询
+                </Button>
+                <Button
+                  disabled={loading}
+                  style={{ marginLeft: 8 }}
+                  onClick={this.handleSearchReset}
+                >
+                  重置
+                </Button>
+              </span>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+    );
+  }
 
-  //     this.getDeployList(1, fieldsValue);
-  //   });
-  // };
+  handleSearch = e => {
+    e.preventDefault();
 
-  // handleSearchReset = () => {
-  //   const { form } = this.props;
-  //   form.resetFields();
+    const { form } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
 
-  //   this.setState({
-  //     searchValues: {},
-  //   });
-  // };
+      this.query = fieldsValue;
+      this.getCiStatusList();
+    });
+  };
 
-  getCiStatusList(page, query, perPage) {
-    this.props.getCiStatusList(page, query, perPage);
+  handleSearchReset = () => {
+    const { form } = this.props;
+    form.resetFields();
+
+    this.query = {};
+    this.getCiStatusList();
+  };
+
+  getCiStatusList(page = 1) {
+    this.props.getCiStatusList(page, this.query, this.perPage);
   }
 
   handlePageChange = (page, _) => {
     const { perPage } = this.props.info;
-    this.getCiStatusList(page, {}, perPage);
+    this.perPage = perPage;
+    this.getCiStatusList(page);
   };
+
   handleSizeChange = (current, size) => {
     if (current !== size) {
-      console.log(size);
-      this.getCiStatusList(1, {}, size);
+      this.perPage = size;
+      this.getCiStatusList();
     }
   };
   getTotalText = total => `共 ${total} 条`;
@@ -79,7 +174,7 @@ class CiStatusList extends Component {
     const pagination = {
       showQuickJumper: true,
       showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '40', '60'],
+      pageSizeOptions: ['10', '20', '40', '80', '160'],
       pageSize: perPage,
       total: total,
       showTotal: this.getTotalText,
@@ -89,6 +184,7 @@ class CiStatusList extends Component {
 
     return (
       <div className="hl-padding-content">
+        <div className="ci-status-list-search">{this.renderSearchCard()}</div>
         <Table
           dataSource={dataSource}
           rowKey={item => item.id}
@@ -100,7 +196,7 @@ class CiStatusList extends Component {
           <Column title="负责人" dataIndex="owner" />
           <Column
             title="业务组"
-            dataIndex="team_name"
+            dataIndex="team"
             render={name => {
               return <span>{name || '未知'}</span>;
             }}

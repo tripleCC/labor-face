@@ -19,7 +19,7 @@ function getCiStatusList(page = 1, query = {}, perPage = 10) {
         params: {
           page,
           per_page: perPage,
-          query,
+          ...query,
         },
       })
       .then(
@@ -31,6 +31,8 @@ function getCiStatusList(page = 1, query = {}, perPage = 10) {
               page,
               perPage,
               total: res.data.meta.total_count,
+              teams: res.data.meta.teams,
+              owners: res.data.meta.owners,
             },
           });
         },
@@ -64,6 +66,8 @@ function reducer(state = initialState, action) {
         page: action.data.page,
         perPage: action.data.perPage,
         total: action.data.total,
+        teams: action.data.teams,
+        owners: action.data.owners,
         loading: false,
         error: null,
       };
