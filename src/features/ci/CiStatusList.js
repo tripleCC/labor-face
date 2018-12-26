@@ -192,7 +192,13 @@ class CiStatusList extends Component {
           pagination={pagination}
         >
           <Column title="ID" dataIndex="id" />
-          <Column title="名称" dataIndex="name" />
+          <Column
+            title="名称"
+            dataIndex="name"
+            render={(name, item) => {
+              return <a href={item.web_url} target="_blank">{name}</a>;
+            }}
+          />
           <Column title="负责人" dataIndex="owner" />
           <Column
             title="业务组"
