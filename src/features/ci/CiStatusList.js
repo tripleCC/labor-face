@@ -12,7 +12,7 @@ class CiStatusList extends Component {
   };
 
   componentDidMount() {
-    this.getOperationList();
+    this.getCiStatusList();
   }
 
   componentDidUpdate(prevProps) {
@@ -24,10 +24,6 @@ class CiStatusList extends Component {
     }
   }
 
-  getOperationList = () => {
-    this.props.getOperationList();
-  };
-
   getDataSource() {
     const { items, byId } = this.props.info;
     if (!items) return [];
@@ -37,32 +33,59 @@ class CiStatusList extends Component {
     });
   }
 
-  handleSearch = e => {
-    e.preventDefault();
+  // handleSearch = e => {
+  //   e.preventDefault();
 
-    const { form } = this.props;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
+  //   const { form } = this.props;
+  //   form.validateFields((err, fieldsValue) => {
+  //     if (err) return;
 
-      this.getDeployList(1, fieldsValue);
-    });
+  //     this.getDeployList(1, fieldsValue);
+  //   });
+  // };
+
+  // handleSearchReset = () => {
+  //   const { form } = this.props;
+  //   form.resetFields();
+
+  //   this.setState({
+  //     searchValues: {},
+  //   });
+  // };
+
+  getCiStatusList(page, query, perPage) {
+    this.props.getCiStatusList(page, query, perPage);
+  }
+
+  handlePageChange = (page, _) => {
+    const { perPage } = this.props.info;
+    this.getCiStatusList(page, {}, perPage);
   };
-
-  handleSearchReset = () => {
-    const { form } = this.props;
-    form.resetFields();
-
-    this.setState({
-      searchValues: {},
-    });
+  handleSizeChange = (current, size) => {
+    if (current !== size) {
+      console.log(size);
+      this.getCiStatusList(1, {}, size);
+    }
   };
+  getTotalText = total => `共 ${total} 条`;
 
   render() {
     const dataSource = this.getDataSource();
 
     const {
-      info: { loading },
+      info: { loading, perPage, total },
     } = this.props;
+
+    const pagination = {
+      showQuickJumper: true,
+      showSizeChanger: true,
+      pageSizeOptions: ['10', '20', '40', '60'],
+      pageSize: perPage,
+      total: total,
+      showTotal: this.getTotalText,
+      onChange: this.handlePageChange,
+      onShowSizeChange: this.handleSizeChange,
+    };
 
     return (
       <div className="hl-padding-content">
@@ -70,7 +93,7 @@ class CiStatusList extends Component {
           dataSource={dataSource}
           rowKey={item => item.id}
           loading={loading}
-          pagination={{ pageSize: 50 }}
+          pagination={pagination}
         >
           <Column title="ID" dataIndex="id" />
           <Column title="名称" dataIndex="name" />
@@ -107,7 +130,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getOperationList: (page, query) => dispatch(getCiStatusList()),
+    getCiStatusList: (page, query, perPage) =>
+      dispatch(getCiStatusList(page, query, perPage)),
   };
 }
 

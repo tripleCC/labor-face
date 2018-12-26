@@ -9,19 +9,28 @@ import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
 
 // Action
-function getCiStatusList() {
+function getCiStatusList(page = 1, query = {}, perPage = 10) {
   return dispatch => {
     dispatch({
       type: CI_GET_CI_STATUS_LIST_BEGIN,
     });
     return axios
-      .get(`${SERVER_HOST}/ci/status`)
+      .get(`${SERVER_HOST}/ci/status`, {
+        params: {
+          page,
+          per_page: perPage,
+          query,
+        },
+      })
       .then(
         res => {
           dispatch({
             type: CI_GET_CI_STATUS_LIST_SUCCESS,
             data: {
               items: res.data.data,
+              page,
+              perPage,
+              total: res.data.meta.total_count,
             },
           });
         },
@@ -53,6 +62,8 @@ function reducer(state = initialState, action) {
         ),
         items: action.data.items.map(item => item.id),
         page: action.data.page,
+        perPage: action.data.perPage,
+        total: action.data.total,
         loading: false,
         error: null,
       };
