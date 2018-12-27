@@ -45,7 +45,13 @@ class CiStatusList extends Component {
   }
 
   getQuery(search) {
-    return queryString.parse(search || this.props.location.search) || {};
+    return (
+      queryString.parse(
+        search === null || search === undefined
+          ? this.props.location.search
+          : search,
+      ) || {}
+    );
   }
 
   getCiStatusList(query) {
