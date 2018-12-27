@@ -9,7 +9,7 @@ import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
 
 // Action
-function getCiStatusList(page = 1, query = {}, perPage = 10) {
+function getCiStatusList(query = {}) {
   return dispatch => {
     dispatch({
       type: CI_GET_CI_STATUS_LIST_BEGIN,
@@ -17,8 +17,8 @@ function getCiStatusList(page = 1, query = {}, perPage = 10) {
     return axios
       .get(`${SERVER_HOST}/ci/status`, {
         params: {
-          page,
-          per_page: perPage,
+          page: 1,
+          per_page: 10,
           ...query,
         },
       })
@@ -28,8 +28,8 @@ function getCiStatusList(page = 1, query = {}, perPage = 10) {
             type: CI_GET_CI_STATUS_LIST_SUCCESS,
             data: {
               items: res.data.data,
-              page,
-              perPage,
+              page: query.page,
+              perPage: query.perPage,
               total: res.data.meta.total_count,
               teams: res.data.meta.teams,
               owners: res.data.meta.owners,

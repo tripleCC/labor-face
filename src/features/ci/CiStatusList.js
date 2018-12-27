@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
   Table,
   Form,
-  Select,
   Button,
   Col,
   Row,
@@ -13,11 +12,11 @@ import {
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { getCiStatusList } from './redux/getCiStatusList';
+import queryString from 'query-string';
 import './CiStatusList.css';
 
 const { Column } = Table;
 const FormItem = Form.Item;
-const { Option } = Select;
 
 class CiStatusList extends Component {
   state = {
@@ -26,20 +25,31 @@ class CiStatusList extends Component {
     owners: [],
   };
 
-  perPage = 10;
-  query = {};
-
   componentDidMount() {
     this.getCiStatusList();
   }
 
   componentDidUpdate(prevProps) {
     const {
-      info: { error },
+      info: { error, loading },
     } = this.props;
     if (!prevProps.info.error && error) {
       message.error(error);
     }
+
+    const current = this.getQuery();
+    const prev = this.getQuery(prevProps.location.search);
+    if (!loading && JSON.stringify(current) !== JSON.stringify(prev)) {
+      this.getCiStatusList(current);
+    }
+  }
+
+  getQuery(search) {
+    return queryString.parse(search || this.props.location.search) || {};
+  }
+
+  getCiStatusList(query) {
+    this.props.getCiStatusList(query || this.getQuery());
   }
 
   getDataSource() {
@@ -69,7 +79,9 @@ class CiStatusList extends Component {
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="业务组">
-              {getFieldDecorator('team')(
+              {getFieldDecorator('team', {
+                initialValue: this.getQuery().team,
+              })(
                 <AutoComplete
                   dataSource={
                     this.state.teams.length > 0 ? this.state.teams : teams
@@ -88,7 +100,9 @@ class CiStatusList extends Component {
           </Col>
           <Col md={8} sm={24}>
             <FormItem label="负责人">
-              {getFieldDecorator('owner')(
+              {getFieldDecorator('owner', {
+                initialValue: this.getQuery().owner,
+              })(
                 <AutoComplete
                   dataSource={
                     this.state.owners.length > 0 ? this.state.owners : owners
@@ -133,53 +147,57 @@ class CiStatusList extends Component {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      this.query = fieldsValue;
-      this.getCiStatusList();
+      this.pushMergeQuery({ page: 1, ...fieldsValue });
     });
   };
+
+  pushMergeQuery(query) {
+    const preQuery = this.getQuery();
+    const newQuery = queryString.stringify(
+      query
+        ? { ...preQuery, ...query }
+        : { page: preQuery.page, per_page: preQuery.per_page },
+    );
+    this.props.history.push(`/ci-status?${newQuery}`);
+  }
 
   handleSearchReset = () => {
     const { form } = this.props;
     form.resetFields();
 
-    this.query = {};
-    this.getCiStatusList();
+    this.pushMergeQuery();
   };
 
-  getCiStatusList(page = 1) {
-    this.props.getCiStatusList(page, this.query, this.perPage);
-  }
-
   handlePageChange = (page, _) => {
-    const { perPage } = this.props.info;
-    this.perPage = perPage;
-    this.getCiStatusList(page);
+    this.pushMergeQuery({ page });
   };
 
   handleSizeChange = (current, size) => {
     if (current !== size) {
-      this.perPage = size;
-      this.getCiStatusList();
+      this.pushMergeQuery({ page: 1, per_page: size });
     }
   };
+
   getTotalText = total => `共 ${total} 条`;
 
   render() {
     const dataSource = this.getDataSource();
 
     const {
-      info: { loading, perPage, total },
+      info: { loading, total },
     } = this.props;
 
+    const query = this.getQuery();
     const pagination = {
       showQuickJumper: true,
       showSizeChanger: true,
       pageSizeOptions: ['10', '20', '40', '80', '160'],
-      pageSize: perPage,
+      pageSize: Number(query.per_page),
       total: total,
       showTotal: this.getTotalText,
       onChange: this.handlePageChange,
       onShowSizeChange: this.handleSizeChange,
+      current: Number(query.page),
     };
 
     return (
@@ -196,7 +214,11 @@ class CiStatusList extends Component {
             title="名称"
             dataIndex="name"
             render={(name, item) => {
-              return <a href={item.web_url} target="_blank">{name}</a>;
+              return (
+                <a href={item.web_url} target="_blank">
+                  {name}
+                </a>
+              );
             }}
           />
           <Column title="负责人" dataIndex="owner" />
@@ -232,8 +254,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getCiStatusList: (page, query, perPage) =>
-      dispatch(getCiStatusList(page, query, perPage)),
+    getCiStatusList: query => dispatch(getCiStatusList(query)),
   };
 }
 
