@@ -227,6 +227,7 @@ class CiStatusList extends Component {
               );
             }}
           />
+          <Column title="最新版本" dataIndex="version" />
           <Column title="负责人" dataIndex="owner" />
           <Column
             title="业务组"
