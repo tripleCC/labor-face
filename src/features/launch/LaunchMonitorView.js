@@ -72,7 +72,7 @@ renderLoad() {
   const { infos } = this.props
   const infosData = infos.map(info => {
     return {
-      gender: '+Load总耗时',
+      gender: '+Load总耗时(ms)',
       devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseInt(info.load_total),
@@ -89,7 +89,7 @@ renderWillDid() {
   const { infos } = this.props
   const infosData = infos.map(info => {
     return {
-      gender: 'WillLaunch-DidLaunch',
+      gender: 'WillLaunch-DidLaunch(ms)',
       devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseFloat(info.will_to_did),
@@ -107,7 +107,7 @@ renderStartDid() {
   const { infos } = this.props
   const infosData = infos.map(info => {
     return {
-      gender: '进程启动-DidLaunch',
+      gender: '进程启动-DidLaunch(ms)',
       devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseInt(info.start_to_did),
