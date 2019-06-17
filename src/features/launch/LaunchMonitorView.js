@@ -53,10 +53,10 @@ renderChart(infosData) {
             shape="circle"
             size={4}
             tooltip={[
-              "gender*time*date",
-              (gender, time, date) => {
+              "time*date*devName",
+              (time, date, devName) => {
                 return {
-                  name: gender,
+                  name: devName,
                   value: (new Date(date)).toLocaleString() + ", " + time + "(ms)"
                 };
               }
@@ -73,6 +73,7 @@ renderLoad() {
   const infosData = infos.map(info => {
     return {
       gender: '+Load总耗时',
+      devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseInt(info.load_total),
     }
@@ -89,6 +90,7 @@ renderWillDid() {
   const infosData = infos.map(info => {
     return {
       gender: 'WillLaunch-DidLaunch',
+      devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseFloat(info.will_to_did),
     }
@@ -106,6 +108,7 @@ renderStartDid() {
   const infosData = infos.map(info => {
     return {
       gender: '进程启动-DidLaunch',
+      devName: info.device.simple_name,
       date: new Date(info.created_at),
       time: parseInt(info.start_to_did),
     }
