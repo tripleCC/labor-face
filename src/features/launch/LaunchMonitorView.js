@@ -28,8 +28,7 @@ class LaunchMonitorView extends Component {
 renderChart(infosData) {
   const label = {
     formatter(text, item, index) {
-      const info = infosData[Math.min(index, infosData.length - 1)]
-      return info.date.toLocaleDateString('en-GB');
+      return new Date(parseInt(text)).toLocaleDateString('en-GB');
     }
   }
   return (
@@ -58,7 +57,7 @@ renderChart(infosData) {
               (gender, time, date) => {
                 return {
                   name: gender,
-                  value: date + ", " + time + "(ms)"
+                  value: (new Date(date)).toLocaleString() + ", " + time + "(ms)"
                 };
               }
             ]}
