@@ -37,7 +37,7 @@ class HomePage extends React.Component {
                 <Route path="/deploys" component={MainDeployList} />
                 <Route path="/operations" component={OperationsList} />
                 <Route path="/ci-status" component={CiStatusList} />
-                <Route path="/monitor/launch" component={LaunchMonitorView} />
+                <Route path="/monitor-launch" component={LaunchMonitorView} />
                 <Route path="/oauth/handler" component={LoginHandler} />
               </Switch>
             </Spin>

@@ -46,10 +46,17 @@ class HomeLayout extends React.Component {
                 <span>CI 状态</span>
               </Link>
             </Menu.Item>
-            <Menu.Item key="/monitor">
-              <Link to="/monitor/launch">
+            <Menu.Item key="/monitor-launch">
+              <Link to="/monitor-launch">
                 <Icon type="caret-right" />
                 <span>启动监测</span>
+              </Link>
+            </Menu.Item>
+
+            <Menu.Item key="/monitor-leak">
+              <Link to="/monitor-leak">
+                <Icon type="bg-colors" />
+                <span>泄漏监测</span>
               </Link>
             </Menu.Item>
           </Menu>

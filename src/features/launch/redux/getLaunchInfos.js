@@ -4,6 +4,10 @@ import {
   MONITOR_LAUNCH_GET_LAUNCH_INFOS_SUCCESS,
   MONITOR_LAUNCH_GET_LAUNCH_INFOS_FAILURE,
 } from './constants';
+import {
+  beginContentSpin,
+  endContentSpin,
+} from '../../common/redux/showContentSpin'
 
 import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
@@ -14,13 +18,14 @@ function getLaunchInfos(appName, osName, deviceName) {
     dispatch({
       type: MONITOR_LAUNCH_GET_LAUNCH_INFOS_BEGIN,
     });
+    beginContentSpin(dispatch);
+
     return axios
       .get(`${SERVER_HOST}/app/monitor/launch`, {
         params: {
           app_name: appName,
           os_name: osName,
           device_name: deviceName,
-          // query,
         },
       })
       .then(
@@ -31,12 +36,14 @@ function getLaunchInfos(appName, osName, deviceName) {
               items: res.data.data,
             },
           });
+          endContentSpin(dispatch);
         },
         err => {
           dispatch({
             type: MONITOR_LAUNCH_GET_LAUNCH_INFOS_FAILURE,
             data: err.message,
           });
+          endContentSpin(dispatch);
         },
       );
   };
