@@ -6,12 +6,13 @@ import {
   Button,
   Col,
   Row,
-  Input,
+  Popconfirm,
   message,
   AutoComplete
 } from 'antd';
 import { withRouter } from 'react-router';
 import { getLeakInfos } from './redux/getLeakInfos';
+import { fixLeakInfo } from './redux/fixLeakInfo';
 import './LeaksMonitorView.css';
 
 const { Column } = Table;
@@ -37,6 +38,12 @@ class LeaksMonitorView extends Component {
   };
 
   handlePageChange = (page, _) => this.getLeakInfosList(page);
+
+  changeLeakStatus = (itemId) => {
+    this.props.fixLeakInfo(itemId, () => {
+      console.log('曾给');
+    });
+  }
 
   render() {
     const {
@@ -66,6 +73,26 @@ class LeaksMonitorView extends Component {
               return <pre>{trace.split('->').join("\n-> ")}</pre>;
             }}
           />
+          <Column title="操作"
+            render={item => {
+              if (item.active) {
+                return (
+                  <Popconfirm
+                    title="确认标记为已解决?"
+                    cancelText="取消"
+                    okText="确定"
+                    onConfirm={() => this.changeLeakStatus(item.id)}
+                  >
+                    <a>变更状态</a>
+                  </Popconfirm>
+                )
+              } else {
+                return (
+                  <div>{`已解决-${item.user.nickname}`}</div>
+                )
+              }
+            }}
+          />
         </Table>
       </div>
     );
@@ -73,8 +100,6 @@ class LeaksMonitorView extends Component {
 }
 
 function mapStateToProps(state) {
-console.log(state)
-
   const { items, loading } = state.leaks
   return { items, loading};
 }
@@ -82,6 +107,7 @@ console.log(state)
 function mapDispatchToProps(dispatch) {
   return {
     getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, '二维火掌柜')),
+    fixLeakInfo: (id, callback) => dispatch(fixLeakInfo(id, callback)),
   };
 }
 
