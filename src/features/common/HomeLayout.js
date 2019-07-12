@@ -53,8 +53,8 @@ class HomeLayout extends React.Component {
               </Link>
             </Menu.Item>
 
-            <Menu.Item key="/monitor-leak">
-              <Link to="/monitor-leak">
+            <Menu.Item key="/monitor-leaks">
+              <Link to="/monitor-leaks">
                 <Icon type="bg-colors" />
                 <span>泄漏监测</span>
               </Link>

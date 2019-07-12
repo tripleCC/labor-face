@@ -11,6 +11,7 @@ import MainDeployDetailCard from './features/deploys/MainDeployDetailCard';
 import OperationsList from './features/operations/OperationsList';
 import CiStatusList from './features/ci/CiStatusList';
 import LaunchMonitorView from './features/launch/LaunchMonitorView'
+import LeaksMonitorView from './features/leaks/LeaksMonitorView'
 
 class HomePage extends React.Component {
   render() {
@@ -38,6 +39,7 @@ class HomePage extends React.Component {
                 <Route path="/operations" component={OperationsList} />
                 <Route path="/ci-status" component={CiStatusList} />
                 <Route path="/monitor-launch" component={LaunchMonitorView} />
+                <Route path="/monitor-leaks" component={LeaksMonitorView} />
                 <Route path="/oauth/handler" component={LoginHandler} />
               </Switch>
             </Spin>

@@ -7,6 +7,7 @@ import websocketReducer from '../features/websocket/redux/reducer';
 import operationsReducer from '../features/operations/redux/reducer';
 import ciReducer from '../features/ci/redux/reducer';
 import launchReducer from '../features/launch/redux/reducer';
+import leaksReducer from '../features/leaks/redux/reducer';
 
 export default history =>
   combineReducers({
@@ -18,5 +19,6 @@ export default history =>
     operations: operationsReducer,
     ci: ciReducer,
     launch: launchReducer,
+    leaks: leaksReducer,
     // rest of your reducers
   });
