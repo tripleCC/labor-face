@@ -50,7 +50,7 @@ class LaunchMonitorView extends Component {
     const label = {
       formatter(text, item, index) {
         let date =  new Date(parseInt(text))
-        return `${date.getMonth()}/${date.getDate()}`
+        return `${date.getMonth() + 1}/${date.getDate()}`
       }
     }
     return (
