@@ -59,10 +59,13 @@ class LeaksMonitorView extends Component {
           rowKey={item => item.trace}
           loading={loading}
           pagination={pagination}
-          // onChange=
         >
-          <Column title="类名" dataIndex="name" />
-          <Column title="引用路径" dataIndex="trace" />
+          <Column width='300px' title="类名" dataIndex="name" />
+          <Column title="引用路径" dataIndex="trace" 
+            render={trace => {
+              return <pre>{trace.split('->').join("\n-> ")}</pre>;
+            }}
+          />
         </Table>
       </div>
     );
