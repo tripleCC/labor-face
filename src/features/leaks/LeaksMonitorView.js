@@ -8,6 +8,7 @@ import {
   Row,
   Popconfirm,
   message,
+  Popover,
   AutoComplete
 } from 'antd';
 import { withRouter } from 'react-router';
@@ -73,6 +74,31 @@ class LeaksMonitorView extends Component {
               return <pre>{trace.split('->').join("\n-> ")}</pre>;
             }}
           />
+          <Column title="循环引用" dataIndex="cycles" 
+            render={cycles => {
+               
+              return cycles ? (
+                <Popover
+                  placement="top"
+                  title="循环引用"
+                  content={
+                    <pre>
+                      {cycles
+                        ? cycles.split('+').join("\n---------------\n").split('|').join("\n  ")
+                        : '无'}
+                    </pre>
+                  }
+                >
+                  <a target="_blank">{`${cycles.split('+').length}个`}</a>
+                </Popover>
+              ) : (
+                <div>无</div>
+              );
+              // ( 
+              //   <pre>{cycles ? cycles.split('+').join("\n") : ''}</pre> 
+              // );
+            }}
+          />
           <Column title="操作"
             render={item => {
               if (item.active) {
@@ -106,6 +132,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    // getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, 'TDFAppMonitor_Example')),
     getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, '二维火掌柜')),
     fixLeakInfo: (id, callback) => dispatch(fixLeakInfo(id, callback)),
   };
