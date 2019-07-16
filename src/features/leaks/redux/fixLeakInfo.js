@@ -38,7 +38,6 @@ function fixLeakInfo(id, callback) {
 
 // Reducer
 function reducer(state = initialState, action) {
-  console.log(action.type)
   switch (action.type) {
     case MONITOR_LEAKS_FIX_LEAKS_INFO_BEGIN:
       return {

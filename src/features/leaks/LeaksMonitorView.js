@@ -64,7 +64,7 @@ class LeaksMonitorView extends Component {
         {/* <div className="main-deploy-list-search">{this.renderSearchCard()}</div> */}
         <Table
           dataSource={items}
-          rowKey={item => item.trace}
+          rowKey={item => item.updated_at}
           loading={loading}
           pagination={pagination}
         >
@@ -94,11 +94,9 @@ class LeaksMonitorView extends Component {
               ) : (
                 <div>无</div>
               );
-              // ( 
-              //   <pre>{cycles ? cycles.split('+').join("\n") : ''}</pre> 
-              // );
             }}
           />
+          <Column title="版本" dataIndex="app_info.version" />
           <Column title="操作"
             render={item => {
               if (item.active) {
@@ -126,8 +124,7 @@ class LeaksMonitorView extends Component {
 }
 
 function mapStateToProps(state) {
-  const { items, loading } = state.leaks
-  return { items, loading};
+  return state.leaks;
 }
 
 function mapDispatchToProps(dispatch) {

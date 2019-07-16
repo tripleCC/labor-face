@@ -9,7 +9,7 @@ import { SERVER_HOST } from '../../../common/constants';
 import { initialState } from './reducer';
 
 // Action
-function getLeakInfos(page = 1, appName, perPage = 15) {
+function getLeakInfos(page = 1, appName, perPage = 20) {
   return dispatch => {
     dispatch({
       type: MONITOR_LEAKS_GET_LEAKS_INFOS_BEGIN,
@@ -18,6 +18,8 @@ function getLeakInfos(page = 1, appName, perPage = 15) {
       .get(`${SERVER_HOST}/app/monitor/leaks`, {
         params: {
           app_name: appName,
+          per_page: perPage,
+          page,
         },
       })
       .then(
