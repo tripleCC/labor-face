@@ -16,6 +16,7 @@ import {
 import { withRouter } from 'react-router';
 import { getLeakInfos } from './redux/getLeakInfos';
 import { addLeakComment } from './redux/addLeakComment';
+import { getApps } from './redux/getApps';
 import { fixLeakInfo } from './redux/fixLeakInfo';
 import './LeaksMonitorView.css';
 import AddLeakCommentModal from './AddLeakCommentModal';
@@ -27,11 +28,15 @@ const { TextArea } = Input;
 class LeaksMonitorView extends Component {
   state = {
     addModalVisible: false,
+    appName: localStorage.getItem('appName') || '二维火掌柜',
   };
 
-
   componentDidMount() {
-    this.getLeakInfosList();
+    console.log(localStorage.getItem('appName'))
+
+    this.props.getApps(() => {
+      this.getLeakInfosList(1, this.state.appName);
+    })
   }
 
   componentDidUpdate(prevProps) {
@@ -45,7 +50,7 @@ class LeaksMonitorView extends Component {
     this.props.getLeakInfosList(page, query);
   };
 
-  handlePageChange = (page, _) => this.getLeakInfosList(page);
+  handlePageChange = (page, _) => this.getLeakInfosList(page, this.state.appName);
 
   changeLeakStatus = (itemId) => {
     this.props.fixLeakInfo(itemId, () => {
@@ -77,6 +82,64 @@ class LeaksMonitorView extends Component {
     // fieldsValue.content;
   };
 
+  handleSearch = e => {
+    e.preventDefault();
+
+    const { form } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      let appName = fieldsValue['appName'];
+      localStorage.setItem('appName', appName);
+      this.setState({ appName });
+      this.getLeakInfosList(1, appName);
+    });
+  };
+
+  renderSearchCard() {
+    const {
+      form: { getFieldDecorator },
+      leaks: { loading, appNames },
+    } = this.props;
+
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline">
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={24}>
+          <FormItem label="应用名称">
+              {getFieldDecorator('appName', {
+                initialValue: this.state.appName,
+              })(
+                <AutoComplete
+                  dataSource={
+                    appNames
+                  }
+                  onSearch={value => {
+                    this.setState({
+                      appNames: value
+                        ? appNames.filter(name => name.includes(value))
+                        : appNames,
+                    });
+                  }}
+                  placeholder="请输入应用名称"
+                />,
+              )}
+            </FormItem>
+          </Col>
+          <Col md={5} sm={24}>
+            <FormItem>
+              <span>
+                <Button type="primary" htmlType="submit" disabled={loading}>
+                  查询
+                </Button>
+              </span>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+    );
+  }
+
   render() {
     const {
       leaks: {
@@ -94,7 +157,7 @@ class LeaksMonitorView extends Component {
     const { addModalVisible } = this.state;
     return (
       <div className="hl-padding-content">
-        {/* <div className="main-deploy-list-search">{this.renderSearchCard()}</div> */}
+        <div className="leaks-monitor-view-search">{this.renderSearchCard()}</div>
         <Table
           dataSource={items}
           rowKey={item => item.updated_at}
@@ -188,17 +251,19 @@ function mapStateToProps(state) {
   const {
     leaks,
     user: { logined },
+    appNames,
   } = state;
 
-  return { leaks, logined };
+  return { leaks, logined, appNames};
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     // getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, 'TDFAppMonitor_Example')),
-    getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, '二维火掌柜')),
+    getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, appName)),
     fixLeakInfo: (id, callback) => dispatch(fixLeakInfo(id, callback)),
     addLeakComment: (id, content, callback) => dispatch(addLeakComment(id, content, callback)),
+    getApps: (callback) => dispatch(getApps(callback)),
   };
 }
 
