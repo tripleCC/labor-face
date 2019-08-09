@@ -32,8 +32,6 @@ class LeaksMonitorView extends Component {
   };
 
   componentDidMount() {
-    console.log(localStorage.getItem('appName'))
-
     this.props.getApps(() => {
       this.getLeakInfosList(1, this.state.appName);
     })
