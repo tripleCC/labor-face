@@ -23,6 +23,7 @@ import { getLaunchInfos } from './redux/getLaunchInfos';
 import { getDevices } from './redux/getDevices';
 import { max } from 'moment';
 import './LaunchMonitorView.css';
+import { getApps } from '../leaks/redux/getApps';
 
 const { Column } = Table;
 const FormItem = Form.Item;
@@ -32,10 +33,14 @@ class LaunchMonitorView extends Component {
     apps: [],
     devices: [],
     oss: [],
-  };
+    deviceName: localStorage.getItem('launchDeviceName'),
+    appName: localStorage.getItem('launchAppName') || '二维火掌柜',
+  }; 
 
   componentDidMount() {
-    this.props.getLaunchInfos();
+    this.props.getApps(() => {
+      this.props.getLaunchInfos(this.state.appName, 'iOS', this.state.deviceName);
+    })
     this.props.getDevices();
   }
 
@@ -75,12 +80,32 @@ class LaunchMonitorView extends Component {
               shape="circle"
               size={4}
               tooltip={[
-                "time*date*devName",
-                (time, date, devName) => {
-                  return {
-                    name: devName,
-                    value: (new Date(date)).toLocaleString() + ", " + time + "(ms)"
-                  };
+                "time*date*devName*loads",
+                (time, date, devName, loads) => {
+                  if (loads) {
+                    let loadsDesc = loads.sort((p, n) => {
+                      let x = parseFloat(p.duration);
+                      let y = parseFloat(n.duration);
+                      if (x < y) {
+                        return 1;
+                      }
+                      if (x > y) {
+                          return -1;
+                      }
+                      return 0;
+                    }).map((l) => {
+                      return `${l.name} ${l.duration}`
+                    }).join("<->");
+                    return {
+                      name: devName,
+                      value: (new Date(date)).toLocaleString() + ", " + time + "(ms) \n耗时前十(ms): " + loadsDesc
+                    };
+                  } else {
+                    return {
+                      name: devName,
+                      value: (new Date(date)).toLocaleString() + ", " + time + "(ms)"
+                    };
+                  }
                 }
               ]}
             />
@@ -98,6 +123,7 @@ class LaunchMonitorView extends Component {
         devName: info.device.simple_name,
         date: new Date(info.created_at),
         time: parseInt(info.load_total),
+        loads: info.load_duration_pairs,
       }
     })
 
@@ -158,8 +184,11 @@ class LaunchMonitorView extends Component {
       if (err) return;
 
       let deviceName = fieldsValue['device_name'];
+      let appName = fieldsValue['app_name'];
       deviceName = deviceName !== '全部' ? deviceName : null;
-      this.props.getLaunchInfos(fieldsValue['app_name'], 'iOS', deviceName);
+      localStorage.setItem('launchDeviceName', deviceName);
+      localStorage.setItem('launchAppName', appName);
+      this.props.getLaunchInfos(appName, 'iOS', deviceName);
     });
   };
 
@@ -175,11 +204,11 @@ class LaunchMonitorView extends Component {
           <Col md={8} sm={24}>
             <FormItem label="App名称">
               {getFieldDecorator('app_name', {
-                initialValue: '二维火掌柜',
+                initialValue: this.state.appName,
               })(
                 <AutoComplete
                   dataSource={
-                    this.state.apps.length > 0 ? this.state.apps : apps
+                    this.props.appNames
                   }
                   placeholder="请输入App名称"
                 />,
@@ -189,7 +218,7 @@ class LaunchMonitorView extends Component {
           <Col md={8} sm={24}>
             <FormItem label="设备类型">
               {getFieldDecorator('device_name', {
-                initialValue: '全部',
+                initialValue: this.state.deviceName || '全部',
               })(
                 <AutoComplete
                   dataSource={
@@ -205,13 +234,6 @@ class LaunchMonitorView extends Component {
               <span>
                 <Button type="primary" htmlType="submit" disabled={loading}>
                   查询
-                </Button>
-                <Button
-                  disabled={loading}
-                  style={{ marginLeft: 8 }}
-                  onClick={this.handleSearchReset}
-                >
-                  重置
                 </Button>
               </span>
             </FormItem>
@@ -236,14 +258,22 @@ class LaunchMonitorView extends Component {
 }
 
 function mapStateToProps(state) {
-  const { infos, loading, devices } = state.launch
-  return { infos, loading, devices };
+  const { 
+    launch : { 
+      infos, loading, devices
+    },
+    leaks : {
+      appNames
+    }
+  } = state
+  return { infos, loading, devices, appNames };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    getLaunchInfos: (appName, osName, deviceName) => dispatch(getLaunchInfos('二维火掌柜', 'iOS', deviceName)),
+    getLaunchInfos: (appName, osName, deviceName) => dispatch(getLaunchInfos(appName, 'iOS', deviceName)),
     getDevices: () => dispatch(getDevices()),
+    getApps: (callback) => dispatch(getApps(callback)),
   };
 }
 
