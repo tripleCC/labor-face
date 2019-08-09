@@ -48,11 +48,11 @@ function reducer(state = initialState, action) {
     case MONITOR_LAUNCH_GET_DEVICES_SUCCESS:
       return {
         ...state,
-        devices: initialState.devices.concat(
+        devices: Array.from(new Set(initialState.devices.concat(
           action.data.items
             .map(item => item.simple_name)
             .filter(item => item != null)
-            .sort()
+            .sort()))
           ),
         loading: false,
         error: null,
