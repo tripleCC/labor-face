@@ -164,7 +164,7 @@ class LeaksMonitorView extends Component {
               />
             )}
             onFilter={(value, record) => {
-              return record['app_info']['version']
+              return record.app_info.version
                 .toString ()
                 .toLowerCase ()
                 .includes (value);
