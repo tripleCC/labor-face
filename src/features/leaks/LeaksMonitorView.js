@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {
   Table,
   Form,
@@ -10,117 +10,114 @@ import {
   message,
   Popover,
   AutoComplete,
-  Input
+  Input,
+  Icon,
 } from 'antd';
 
-import { withRouter } from 'react-router';
-import { getLeakInfos } from './redux/getLeakInfos';
-import { addLeakComment } from './redux/addLeakComment';
-import { getApps } from './redux/getApps';
-import { fixLeakInfo } from './redux/fixLeakInfo';
+import {withRouter} from 'react-router';
+import {getLeakInfos} from './redux/getLeakInfos';
+import {addLeakComment} from './redux/addLeakComment';
+import {getApps} from './redux/getApps';
+import {fixLeakInfo} from './redux/fixLeakInfo';
 import './LeaksMonitorView.css';
 import AddLeakCommentModal from './AddLeakCommentModal';
 
-const { Column } = Table;
+const {Column} = Table;
 const FormItem = Form.Item;
-const { TextArea } = Input;
+const {TextArea} = Input;
 
 class LeaksMonitorView extends Component {
   state = {
     addModalVisible: false,
-    appName: localStorage.getItem('appName') || '二维火掌柜',
+    appName: localStorage.getItem ('appName') || '二维火掌柜',
   };
 
-  componentDidMount() {
-    this.props.getApps(() => {
-      this.getLeakInfosList(1, this.state.appName);
-    })
-  }
-
-  componentDidUpdate(prevProps) {
-    const { error } = this.props;
-    if (!prevProps.error && error) {
-      message.error(error);
-    }
-  }
-  
-  getLeakInfosList = (page = 1, query = {}) => {
-    this.props.getLeakInfosList(page, query);
-  };
-
-  handlePageChange = (page, _) => this.getLeakInfosList(page, this.state.appName);
-
-  changeLeakStatus = (itemId) => {
-    this.props.fixLeakInfo(itemId, () => {
-      console.log('曾给');
+  componentDidMount () {
+    this.props.getApps (() => {
+      this.getLeakInfosList (1, this.state.appName);
     });
   }
+
+  componentDidUpdate (prevProps) {
+    const {error} = this.props;
+    if (!prevProps.error && error) {
+      message.error (error);
+    }
+  }
+
+  getLeakInfosList = (page = 1, query = {}) => {
+    this.props.getLeakInfosList (page, query);
+  };
+
+  handlePageChange = (page, _) =>
+    this.getLeakInfosList (page, this.state.appName);
+
+  changeLeakStatus = itemId => {
+    this.props.fixLeakInfo (itemId, () => {
+      console.log ('曾给');
+    });
+  };
   handleAddModalVisible = (flag, itemId = null) => {
-    const { logined } = this.props;
+    const {logined} = this.props;
     if (logined) {
-      this.setState({
+      this.setState ({
         itemId,
         addModalVisible: !!flag,
       });
     } else {
-      message.warn('登录后才能执行此操作');
+      message.warn ('登录后才能执行此操作');
     }
   };
 
   handleAdd = fieldsValue => {
     var content = `变更链接: ${fieldsValue.commit_url}`;
     if (fieldsValue.content) {
-      content += `\n变更备注: ${fieldsValue.content.replace(/\n|\r/g, " ")}`;
+      content += `\n变更备注: ${fieldsValue.content.replace (/\n|\r/g, ' ')}`;
     }
-    console.log(content);
-    this.props.addLeakComment(this.state.itemId, content, () => {
-      this.changeLeakStatus(this.state.itemId);
-      this.handleAddModalVisible(false);
-    })
+    console.log (content);
+    this.props.addLeakComment (this.state.itemId, content, () => {
+      this.changeLeakStatus (this.state.itemId);
+      this.handleAddModalVisible (false);
+    });
     // fieldsValue.content;
   };
 
   handleSearch = e => {
-    e.preventDefault();
+    e.preventDefault ();
 
-    const { form } = this.props;
-    form.validateFields((err, fieldsValue) => {
+    const {form} = this.props;
+    form.validateFields ((err, fieldsValue) => {
       if (err) return;
 
       let appName = fieldsValue['appName'];
-      localStorage.setItem('appName', appName);
-      this.setState({ appName });
-      this.getLeakInfosList(1, appName);
+      localStorage.setItem ('appName', appName);
+      this.setState ({appName});
+      this.getLeakInfosList (1, appName);
     });
   };
 
-  renderSearchCard() {
-    const {
-      form: { getFieldDecorator },
-      leaks: { loading, appNames },
-    } = this.props;
+  renderSearchCard () {
+    const {form: {getFieldDecorator}, leaks: {loading, appNames}} = this.props;
 
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+        <Row gutter={{md: 8, lg: 24, xl: 48}}>
           <Col md={8} sm={24}>
-          <FormItem label="应用名称">
-              {getFieldDecorator('appName', {
+            <FormItem label="应用名称">
+              {getFieldDecorator ('appName', {
                 initialValue: this.state.appName,
-              })(
+              }) (
                 <AutoComplete
-                  dataSource={
-                    appNames
-                  }
+                  dataSource={appNames}
                   onSearch={value => {
-                    this.setState({
+                    this.setState ({
                       appNames: value
-                        ? appNames.filter(name => name.includes(value))
+                        ? appNames.filter (name => name.includes (value))
                         : appNames,
                     });
                   }}
                   placeholder="请输入应用名称"
-                />,
+                />
               )}
             </FormItem>
           </Col>
@@ -138,12 +135,48 @@ class LeaksMonitorView extends Component {
     );
   }
 
-  render() {
-    const {
-      leaks: {
-        loading,  perPage, total, items,
-      }
-    } = this.props;
+  getColumnSearchProps (setSelectedKeys, selectedKeys, confirm, clearFilters) {
+    return (
+      <div style={{padding: 8}} className="ant-table-filter-dropdown">
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          placeholder="搜索版本号"
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys (e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => this.handleVersionSearch (selectedKeys, confirm)}
+          style={{width: 188, marginBottom: 8, display: 'block'}}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleVersionSearch (selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{width: 90, marginRight: 8}}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={() => this.handleVersionReset (clearFilters)}
+          size="small"
+          style={{width: 90}}
+        >
+          Reset
+        </Button>
+      </div>
+    );
+  }
+  handleVersionSearch = (selectedKeys, confirm) => {
+    confirm ();
+  };
+  handleVersionReset = clearFilters => {
+    clearFilters ();
+  };
+
+  render () {
+    const {leaks: {loading, perPage, total, items}} = this.props;
 
     const pagination = {
       showQuickJumper: true,
@@ -152,10 +185,12 @@ class LeaksMonitorView extends Component {
       showTotal: this.getTotalText,
       onChange: this.handlePageChange,
     };
-    const { addModalVisible } = this.state;
+    const {addModalVisible} = this.state;
     return (
       <div className="hl-padding-content">
-        <div className="leaks-monitor-view-search">{this.renderSearchCard()}</div>
+        <div className="leaks-monitor-view-search">
+          {this.renderSearchCard ()}
+        </div>
         <Table
           dataSource={items}
           rowKey={item => item.updated_at}
@@ -163,57 +198,97 @@ class LeaksMonitorView extends Component {
           pagination={pagination}
         >
           <Column title="ID" dataIndex="id" />
-          <Column width='300px' title="类名" dataIndex="name" />
-          <Column title="引用路径" dataIndex="trace" 
+          <Column width="300px" title="类名" dataIndex="name" />
+          <Column
+            title="引用路径"
+            dataIndex="trace"
             render={trace => {
-              return <pre>{trace.split('->').join("\n-> ")}</pre>;
+              return <pre>{trace.split ('->').join ('\n-> ')}</pre>;
             }}
           />
-          <Column title="循环引用" dataIndex="cycles" 
+          <Column
+            title="循环引用"
+            dataIndex="cycles"
             render={cycles => {
-               
-              return cycles ? (
-                <Popover
-                  placement="left"
-                  title="循环引用"
-                  content={
-                    <pre>
-                      {cycles
-                        ? cycles.split('+').join("\n---------------\n").split('|').join("\n  ")
-                        : '无'}
-                    </pre>
-                  }
-                >
-                  <a target="_blank">{`${cycles.split('+').length}个`}</a>
-                </Popover>
-              ) : (
-                <div>无</div>
-              );
+              return cycles
+                ? <Popover
+                    placement="left"
+                    title="循环引用"
+                    content={
+                      <pre>
+                        {cycles
+                          ? cycles
+                              .split ('+')
+                              .join ('\n---------------\n')
+                              .split ('|')
+                              .join ('\n  ')
+                          : '无'}
+                      </pre>
+                    }
+                  >
+                    <a target="_blank">{`${cycles.split ('+').length}个`}</a>
+                  </Popover>
+                : <div>无</div>;
             }}
           />
-          <Column title="版本" dataIndex="app_info.version" />
-          <Column title="备注" dataIndex="comments" 
+          <Column
+            title="版本"
+            dataIndex="app_info.version"
+            filterDropdown={({
+              setSelectedKeys,
+              selectedKeys,
+              confirm,
+              clearFilters,
+            }) =>
+              this.getColumnSearchProps (
+                setSelectedKeys,
+                selectedKeys,
+                confirm,
+                clearFilters
+              )}
+            filterIcon={filtered => (
+              <Icon
+                type="search"
+                style={{color: filtered ? '#1890ff' : undefined}}
+              />
+            )}
+            onFilter={(value, record) => {
+              return record.app_info.version
+                .toString ()
+                .toLowerCase ()
+                .includes (value);
+            }}
+            onFilterDropdownVisibleChange={visible => {
+              if (visible) {
+                setTimeout (() => this.searchInput.select ());
+              }
+            }}
+          />
+          <Column
+            title="备注"
+            dataIndex="comments"
             render={comments => {
-              return comments && comments.length ? (
-                <Popover
-                  placement="left"
-                  title="备注内容"
-                  content={
-                    <pre>
-                      {comments
-                        ? comments.map((c) => `【${c.user_name}】${c.content}`).join("\n")
-                        : '无'}
-                    </pre>
-                  }
-                >
-                  <a target="_blank">{`${comments.length}条`}</a>
-                </Popover>
-              ) : (
-                <div>无</div>
-              );
+              return comments && comments.length
+                ? <Popover
+                    placement="left"
+                    title="备注内容"
+                    content={
+                      <pre>
+                        {comments
+                          ? comments
+                              .map (c => `【${c.user_name}】${c.content}`)
+                              .join ('\n')
+                          : '无'}
+                      </pre>
+                    }
+                  >
+                    <a target="_blank">{`${comments.length}条`}</a>
+                  </Popover>
+                : <div>无</div>;
             }}
           />
-          <Column title="操作"
+          <Column
+            title="操作"
             render={item => {
               if (item.active) {
                 return (
@@ -221,15 +296,13 @@ class LeaksMonitorView extends Component {
                     title="确认标记为已解决?"
                     cancelText="取消"
                     okText="确定"
-                    onConfirm={() => this.handleAddModalVisible(true, item.id)}
+                    onConfirm={() => this.handleAddModalVisible (true, item.id)}
                   >
                     <a>变更状态</a>
                   </Popconfirm>
-                )
+                );
               } else {
-                return (
-                  <div>{`已解决-${item.user.nickname}`}</div>
-                )
+                return <div>{`已解决-${item.user.nickname}`}</div>;
               }
             }}
           />
@@ -245,29 +318,26 @@ class LeaksMonitorView extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  const {
-    leaks,
-    user: { logined },
-    appNames,
-  } = state;
+function mapStateToProps (state) {
+  const {leaks, user: {logined}, appNames} = state;
 
-  return { leaks, logined, appNames};
+  return {leaks, logined, appNames};
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     // getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, 'TDFAppMonitor_Example')),
-    getLeakInfosList: (page, appName) => dispatch(getLeakInfos(page, appName)),
-    fixLeakInfo: (id, callback) => dispatch(fixLeakInfo(id, callback)),
-    addLeakComment: (id, content, callback) => dispatch(addLeakComment(id, content, callback)),
-    getApps: (callback) => dispatch(getApps(callback)),
+    getLeakInfosList: (page, appName) =>
+      dispatch (getLeakInfos (page, appName)),
+    fixLeakInfo: (id, callback) => dispatch (fixLeakInfo (id, callback)),
+    addLeakComment: (id, content, callback) =>
+      dispatch (addLeakComment (id, content, callback)),
+    getApps: callback => dispatch (getApps (callback)),
   };
 }
 
-export default withRouter(
-  connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Form.create()(LeaksMonitorView))
+export default withRouter (
+  connect (mapStateToProps, mapDispatchToProps) (
+    Form.create () (LeaksMonitorView)
+  )
 );
